@@ -9,6 +9,20 @@ export default function Dashboard() {
   const [timeRange, setTimeRange] = useState('6months');
   const [showInvoiceBuilder, setShowInvoiceBuilder] = useState(false);
   const [invoiceMode, setInvoiceMode] = useState<'simple' | 'premium'>('simple');
+  const [selectedTemplate, setSelectedTemplate] = useState('modern-minimal');
+  const [currentStep, setCurrentStep] = useState<'template' | 'branding' | 'details' | 'preview'>('template');
+  const [branding, setBranding] = useState({
+    logo: null,
+    primaryColor: '#2563eb',
+    secondaryColor: '#1e40af',
+    fontFamily: 'Inter',
+    companyName: '',
+    tagline: '',
+    address: '',
+    phone: '',
+    email: '',
+    website: ''
+  });
 
   const stats = {
     totalInvoices: 120,
@@ -112,87 +126,259 @@ export default function Dashboard() {
                       </div>
                     ) : (
                       <div className="space-y-6">
-                        <div className="text-center mb-6">
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">Premium Invoice Builder</h3>
-                          <p className="text-gray-600">Choose templates, customize branding, and create professional invoices</p>
-                        </div>
-                        
-                        {/* Template Selection */}
-                        <div className="mb-8">
-                          <h4 className="text-lg font-semibold text-gray-900 mb-4">Choose Template</h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {[
-                              { id: 'modern-minimal', name: 'Modern Minimal', color: 'from-blue-500 to-blue-600' },
-                              { id: 'corporate-classic', name: 'Corporate Classic', color: 'from-gray-500 to-gray-600' },
-                              { id: 'creative-bold', name: 'Creative Bold', color: 'from-purple-500 to-purple-600' },
-                              { id: 'elegant-luxury', name: 'Elegant Luxury', color: 'from-yellow-500 to-yellow-600' }
-                            ].map((template) => (
+                        {/* Step Navigation */}
+                        <div className="flex items-center justify-center space-x-4 mb-8">
+                          {[
+                            { id: 'template', name: 'Template', icon: '🎨' },
+                            { id: 'branding', name: 'Branding', icon: '🖼️' },
+                            { id: 'details', name: 'Details', icon: '📝' },
+                            { id: 'preview', name: 'Preview', icon: '👁️' }
+                          ].map((step, index) => (
+                            <div key={step.id} className="flex items-center">
                               <button
-                                key={template.id}
-                                className="group relative p-4 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all duration-200 hover:shadow-lg"
+                                onClick={() => setCurrentStep(step.id as any)}
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                                  currentStep === step.id
+                                    ? 'bg-blue-600 text-white shadow-lg'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
                               >
-                                <div className={`w-full h-24 bg-gradient-to-br ${template.color} rounded-lg mb-3 flex items-center justify-center`}>
-                                  <span className="text-white font-semibold text-sm">Preview</span>
-                                </div>
-                                <h5 className="font-medium text-gray-900 text-sm">{template.name}</h5>
+                                <span className="text-lg">{step.icon}</span>
+                                <span className="font-medium">{step.name}</span>
                               </button>
-                            ))}
-                          </div>
+                              {index < 3 && (
+                                <div className={`w-6 h-0.5 mx-2 ${
+                                  currentStep === step.id ? 'bg-blue-600' : 'bg-gray-300'
+                                }`} />
+                              )}
+                            </div>
+                          ))}
                         </div>
 
-                        {/* Quick Actions */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
-                            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4">
-                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-                              </svg>
-                            </div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Premium Templates</h4>
-                            <p className="text-sm text-gray-600 mb-4">Choose from beautiful, professional templates</p>
-                            <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                              Browse Templates →
-                            </button>
-                          </div>
+                        {/* Step Content */}
+                        {currentStep === 'template' && (
+                          <div>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-6">Choose Your Template</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              {[
+                                { 
+                                  id: 'modern-minimal', 
+                                  name: 'Modern Minimal', 
+                                  description: 'Clean, professional design perfect for tech and creative businesses',
+                                  color: 'from-blue-500 to-blue-600',
+                                  category: 'modern'
+                                },
+                                { 
+                                  id: 'corporate-classic', 
+                                  name: 'Corporate Classic', 
+                                  description: 'Traditional business layout ideal for established companies',
+                                  color: 'from-gray-500 to-gray-600',
+                                  category: 'classic'
+                                },
+                                { 
+                                  id: 'creative-bold', 
+                                  name: 'Creative Bold', 
+                                  description: 'Eye-catching design for creative agencies and freelancers',
+                                  color: 'from-purple-500 to-purple-600',
+                                  category: 'creative'
+                                },
+                                { 
+                                  id: 'elegant-luxury', 
+                                  name: 'Elegant Luxury', 
+                                  description: 'Sophisticated design for high-end services and luxury brands',
+                                  color: 'from-yellow-500 to-yellow-600',
+                                  category: 'luxury'
+                                }
+                              ].map((template) => (
+                                <div
+                                  key={template.id}
+                                  onClick={() => setSelectedTemplate(template.id)}
+                                  className={`relative cursor-pointer group rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                                    selectedTemplate === template.id
+                                      ? 'border-blue-500 shadow-xl scale-105'
+                                      : 'border-gray-200 hover:border-blue-300 hover:shadow-lg'
+                                  }`}
+                                >
+                                  <div className="aspect-[3/4] bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+                                    <div className="p-4 h-full flex flex-col">
+                                      <div className="bg-white rounded-lg shadow-sm p-4 h-full">
+                                        <div className="flex justify-between items-center mb-4">
+                                          <div className={`w-16 h-8 bg-gradient-to-r ${template.color} rounded`}></div>
+                                          <div className="text-xs text-gray-500">INV-001</div>
+                                        </div>
+                                        
+                                        <div className="space-y-3">
+                                          <div className="h-2 bg-gray-200 rounded w-3/4"></div>
+                                          <div className="h-2 bg-gray-200 rounded w-1/2"></div>
+                                          <div className="h-2 bg-gray-200 rounded w-2/3"></div>
+                                        </div>
+                                        
+                                        <div className="mt-6 space-y-2">
+                                          <div className="h-1 bg-gray-200 rounded"></div>
+                                          <div className="h-1 bg-gray-200 rounded w-4/5"></div>
+                                          <div className="h-1 bg-gray-200 rounded w-3/5"></div>
+                                        </div>
+                                        
+                                        <div className="mt-6 flex justify-between">
+                                          <div className="h-2 bg-gray-200 rounded w-1/3"></div>
+                                          <div className={`h-2 bg-gradient-to-r ${template.color} rounded w-1/4`}></div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
 
-                          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
-                            <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mb-4">
-                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-                              </svg>
+                                  <div className="p-4 bg-white">
+                                    <h3 className="font-semibold text-gray-900 mb-1">{template.name}</h3>
+                                    <p className="text-sm text-gray-600 mb-3">{template.description}</p>
+                                    
+                                    <div className="flex items-center justify-between">
+                                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                        template.category === 'modern' ? 'bg-blue-100 text-blue-800' :
+                                        template.category === 'classic' ? 'bg-gray-100 text-gray-800' :
+                                        template.category === 'creative' ? 'bg-purple-100 text-purple-800' :
+                                        'bg-yellow-100 text-yellow-800'
+                                      }`}>
+                                        {template.category}
+                                      </span>
+                                      
+                                      {selectedTemplate === template.id && (
+                                        <div className="flex items-center text-blue-600">
+                                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                          </svg>
+                                          <span className="text-sm font-medium">Selected</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Brand Customization</h4>
-                            <p className="text-sm text-gray-600 mb-4">Upload logo, choose colors, and customize fonts</p>
-                            <button className="text-purple-600 hover:text-purple-700 font-medium text-sm">
-                              Customize Brand →
-                            </button>
                           </div>
+                        )}
 
-                          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
-                            <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mb-4">
-                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
+                        {currentStep === 'branding' && (
+                          <BrandingCustomization
+                            branding={branding}
+                            onBrandingChange={setBranding}
+                          />
+                        )}
+
+                        {currentStep === 'details' && (
+                          <div>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-6">Invoice Details</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Invoice Number</label>
+                                <input
+                                  type="text"
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  placeholder="INV-001"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                                <input
+                                  type="date"
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
                             </div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Smart Features</h4>
-                            <p className="text-sm text-gray-600 mb-4">Auto-numbering, tax calculations, and more</p>
-                            <button className="text-green-600 hover:text-green-700 font-medium text-sm">
-                              Start Building →
-                            </button>
+                            <div className="mt-6">
+                              <label className="block text-sm font-medium text-gray-700 mb-2">Client Information</label>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input
+                                  type="text"
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  placeholder="Client Name"
+                                />
+                                <input
+                                  type="email"
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  placeholder="Client Email"
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
+                        )}
 
-                        {/* Action Buttons */}
-                        <div className="flex justify-center gap-4 pt-6">
-                          <Link 
-                            href="/invoice-builder" 
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                        {currentStep === 'preview' && (
+                          <div>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-6">Invoice Preview</h3>
+                            <div className="bg-gray-50 rounded-lg p-6">
+                              <div className="bg-white rounded-lg shadow-sm p-6 max-w-2xl mx-auto">
+                                <div className="flex justify-between items-center mb-6">
+                                  {branding.logo && (
+                                    <img src={branding.logo} alt="Logo" className="h-8" />
+                                  )}
+                                  <div className="text-sm text-gray-500">INV-001</div>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                  <div>
+                                    <h2 
+                                      className="text-xl font-bold"
+                                      style={{ 
+                                        fontFamily: branding.fontFamily,
+                                        color: branding.primaryColor 
+                                      }}
+                                    >
+                                      {branding.companyName || 'Your Company'}
+                                    </h2>
+                                    {branding.tagline && (
+                                      <p className="text-sm text-gray-600">{branding.tagline}</p>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="text-sm text-gray-600 space-y-1">
+                                    {branding.address && <p>{branding.address}</p>}
+                                    {branding.phone && <p>{branding.phone}</p>}
+                                    {branding.email && <p>{branding.email}</p>}
+                                    {branding.website && <p>{branding.website}</p>}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Navigation Buttons */}
+                        <div className="flex justify-between pt-6">
+                          <button
+                            onClick={() => {
+                              const steps = ['template', 'branding', 'details', 'preview'];
+                              const currentIndex = steps.indexOf(currentStep);
+                              if (currentIndex > 0) {
+                                setCurrentStep(steps[currentIndex - 1] as any);
+                              }
+                            }}
+                            disabled={currentStep === 'template'}
+                            className="px-6 py-3 border border-gray-300 rounded-xl font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                           >
-                            Open Full Builder
-                          </Link>
-                          <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-medium transition-colors duration-200">
-                            Save as Draft
+                            Previous
                           </button>
+                          
+                          <div className="flex gap-3">
+                            <button
+                              onClick={() => setShowInvoiceBuilder(false)}
+                              className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors duration-200"
+                            >
+                              Close Builder
+                            </button>
+                            <button
+                              onClick={() => {
+                                const steps = ['template', 'branding', 'details', 'preview'];
+                                const currentIndex = steps.indexOf(currentStep);
+                                if (currentIndex < steps.length - 1) {
+                                  setCurrentStep(steps[currentIndex + 1] as any);
+                                }
+                              }}
+                              disabled={currentStep === 'preview'}
+                              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                            >
+                              Next
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}
