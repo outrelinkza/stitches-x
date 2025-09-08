@@ -14,7 +14,7 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className={`sticky top-0 z-20 glass-effect border-b border-gray-200/60 ${className}`}>
-      <div className="w-full flex items-center justify-between h-16 pl-2 pr-4">
+      <div className="w-full flex items-center justify-between h-16 pl-4 pr-4">
         <div className="flex items-center gap-2 flex-shrink-0">
           <Link href="/" className="flex items-center gap-2">
             <div className="flex items-center justify-center size-8 bg-black text-white rounded-lg">
