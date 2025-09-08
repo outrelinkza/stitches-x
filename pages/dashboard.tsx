@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Header from '../components/Header';
 import InvoiceTemplates from '../components/InvoiceTemplates';
 import BrandingCustomization from '../components/BrandingCustomization';
 
 export default function Dashboard() {
+  const router = useRouter();
   const [timeRange, setTimeRange] = useState('6months');
   const [showInvoiceBuilder, setShowInvoiceBuilder] = useState(false);
   const [invoiceMode, setInvoiceMode] = useState<'simple' | 'premium'>('simple');
@@ -30,6 +32,16 @@ export default function Dashboard() {
     overdueInvoices: 15,
     invoiceTypes: 3
   };
+
+  // Handle URL parameter to auto-open premium builder
+  useEffect(() => {
+    if (router.query.builder === 'premium') {
+      setShowInvoiceBuilder(true);
+      setInvoiceMode('premium');
+      // Clean up the URL parameter
+      router.replace('/dashboard', undefined, { shallow: true });
+    }
+  }, [router.query.builder, router]);
 
   return (
     <>
