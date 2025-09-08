@@ -332,7 +332,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Stixches - Professional Invoices in Seconds</title>
+        <title>StitchesX - Professional Invoices in Seconds</title>
         <meta name="description" content="Generate professional invoices instantly with premium templates. Support for freelancers, businesses, and all invoice types." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />

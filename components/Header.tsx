@@ -22,7 +22,7 @@ export default function Header({
                 <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
               </svg>
             </div>
-            <h2 className="text-gray-900 text-xl font-semibold leading-tight">Stixches</h2>
+            <h2 className="text-gray-900 text-xl font-semibold leading-tight">StitchesX</h2>
           </Link>
         </div>
         

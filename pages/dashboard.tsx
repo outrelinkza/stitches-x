@@ -103,7 +103,7 @@ export default function Dashboard() {
   return (
     <>
       <Head>
-        <title>Dashboard - Stixches</title>
+        <title>Dashboard - StitchesX</title>
         <meta name="description" content="View your invoice analytics and business insights" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
