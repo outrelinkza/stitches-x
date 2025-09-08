@@ -14,9 +14,9 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className={`sticky top-0 z-20 glass-effect border-b border-gray-200/60 ${className}`}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <Link href="/" className="flex items-center gap-3">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-6 flex items-center justify-between h-16">
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Link href="/" className="flex items-center gap-2">
             <div className="flex items-center justify-center size-8 bg-black text-white rounded-lg">
               <svg className="size-5" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
