@@ -35,11 +35,6 @@ interface Invoice {
 
 export default function Home() {
   const router = useRouter();
-  
-  // Redirect to landing page
-  React.useEffect(() => {
-    router.push('/landing');
-  }, [router]);
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
