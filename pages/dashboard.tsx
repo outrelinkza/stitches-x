@@ -2,9 +2,13 @@ import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import Header from '../components/Header';
+import InvoiceTemplates from '../components/InvoiceTemplates';
+import BrandingCustomization from '../components/BrandingCustomization';
 
 export default function Dashboard() {
   const [timeRange, setTimeRange] = useState('6months');
+  const [showInvoiceBuilder, setShowInvoiceBuilder] = useState(false);
+  const [invoiceMode, setInvoiceMode] = useState<'simple' | 'premium'>('simple');
 
   const stats = {
     totalInvoices: 120,
@@ -44,7 +48,157 @@ export default function Dashboard() {
             <div className="layout-content-container flex flex-col max-w-6xl w-full">
               <div className="flex items-center justify-between gap-3 p-4 mb-4">
                 <h1 className="text-gray-900 text-4xl font-bold tracking-tighter">Dashboard</h1>
+                <div className="flex gap-3">
+                  <Link 
+                    href="/" 
+                    className="bg-[var(--primary-color)] hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    Simple Invoice
+                  </Link>
+                  <button 
+                    onClick={() => setShowInvoiceBuilder(!showInvoiceBuilder)}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    {showInvoiceBuilder ? 'Hide' : 'Premium'} Builder
+                  </button>
+                </div>
               </div>
+
+              {/* Premium Invoice Builder Section */}
+              {showInvoiceBuilder && (
+                <div className="mb-8 p-4">
+                  <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-bold text-gray-900">Create Professional Invoice</h2>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setInvoiceMode('simple')}
+                          className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                            invoiceMode === 'simple'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          Simple Form
+                        </button>
+                        <button
+                          onClick={() => setInvoiceMode('premium')}
+                          className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                            invoiceMode === 'premium'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          Premium Builder
+                        </button>
+                      </div>
+                    </div>
+
+                    {invoiceMode === 'simple' ? (
+                      <div className="text-center py-8">
+                        <div className="mb-4">
+                          <svg className="w-16 h-16 mx-auto text-blue-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <h3 className="text-xl font-semibold text-gray-900 mb-2">Quick Invoice Form</h3>
+                          <p className="text-gray-600 mb-6">Create invoices quickly with our simple form</p>
+                        </div>
+                        <Link 
+                          href="/" 
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-medium transition-colors duration-200 shadow-lg hover:shadow-xl"
+                        >
+                          Go to Simple Form
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="text-center mb-6">
+                          <h3 className="text-xl font-semibold text-gray-900 mb-2">Premium Invoice Builder</h3>
+                          <p className="text-gray-600">Choose templates, customize branding, and create professional invoices</p>
+                        </div>
+                        
+                        {/* Template Selection */}
+                        <div className="mb-8">
+                          <h4 className="text-lg font-semibold text-gray-900 mb-4">Choose Template</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {[
+                              { id: 'modern-minimal', name: 'Modern Minimal', color: 'from-blue-500 to-blue-600' },
+                              { id: 'corporate-classic', name: 'Corporate Classic', color: 'from-gray-500 to-gray-600' },
+                              { id: 'creative-bold', name: 'Creative Bold', color: 'from-purple-500 to-purple-600' },
+                              { id: 'elegant-luxury', name: 'Elegant Luxury', color: 'from-yellow-500 to-yellow-600' }
+                            ].map((template) => (
+                              <button
+                                key={template.id}
+                                className="group relative p-4 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all duration-200 hover:shadow-lg"
+                              >
+                                <div className={`w-full h-24 bg-gradient-to-br ${template.color} rounded-lg mb-3 flex items-center justify-center`}>
+                                  <span className="text-white font-semibold text-sm">Preview</span>
+                                </div>
+                                <h5 className="font-medium text-gray-900 text-sm">{template.name}</h5>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Quick Actions */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
+                            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4">
+                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                              </svg>
+                            </div>
+                            <h4 className="font-semibold text-gray-900 mb-2">Premium Templates</h4>
+                            <p className="text-sm text-gray-600 mb-4">Choose from beautiful, professional templates</p>
+                            <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                              Browse Templates →
+                            </button>
+                          </div>
+
+                          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
+                            <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mb-4">
+                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                              </svg>
+                            </div>
+                            <h4 className="font-semibold text-gray-900 mb-2">Brand Customization</h4>
+                            <p className="text-sm text-gray-600 mb-4">Upload logo, choose colors, and customize fonts</p>
+                            <button className="text-purple-600 hover:text-purple-700 font-medium text-sm">
+                              Customize Brand →
+                            </button>
+                          </div>
+
+                          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
+                            <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mb-4">
+                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </div>
+                            <h4 className="font-semibold text-gray-900 mb-2">Smart Features</h4>
+                            <p className="text-sm text-gray-600 mb-4">Auto-numbering, tax calculations, and more</p>
+                            <button className="text-green-600 hover:text-green-700 font-medium text-sm">
+                              Start Building →
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex justify-center gap-4 pt-6">
+                          <Link 
+                            href="/invoice-builder" 
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                          >
+                            Open Full Builder
+                          </Link>
+                          <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-medium transition-colors duration-200">
+                            Save as Draft
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
                 <div className="flex flex-col gap-2 rounded-2xl p-6 glass-effect bg-white/60 shadow-sm">

@@ -365,14 +365,28 @@ export default function Home() {
                   </span>
                 )}
               </div>
-              {user.freeDownloadsUsed >= user.freeDownloadsLimit && !user.isPremium && (
-                <button 
-                  onClick={() => setShowPaymentModal(true)}
-                  className="bg-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+              <div className="flex items-center gap-3">
+                <Link 
+                  href="/dashboard" 
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200"
                 >
-                  Upgrade to Premium
-                </button>
-              )}
+                  Dashboard
+                </Link>
+                <Link 
+                  href="/invoice-builder" 
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  Premium Builder
+                </Link>
+                {user.freeDownloadsUsed >= user.freeDownloadsLimit && !user.isPremium && (
+                  <button 
+                    onClick={() => setShowPaymentModal(true)}
+                    className="bg-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    Upgrade to Premium
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
