@@ -43,6 +43,63 @@ export default function Dashboard() {
     }
   }, [router.query.builder, router]);
 
+  // Generate premium invoice
+  const generatePremiumInvoice = async () => {
+    try {
+      const invoiceData = {
+        template: selectedTemplate,
+        branding: branding,
+        client: {
+          name: 'Sample Client',
+          email: 'client@example.com',
+          address: '123 Client St, City, State 12345',
+          phone: '+1 (555) 123-4567'
+        },
+        items: [
+          {
+            description: 'Professional Services',
+            quantity: 1,
+            rate: 1000,
+            amount: 1000
+          }
+        ],
+        subtotal: 1000,
+        taxRate: 10,
+        taxAmount: 100,
+        total: 1100,
+        notes: 'Thank you for your business!',
+        paymentTerms: 'Net 30',
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        issueDate: new Date().toISOString().split('T')[0],
+        invoiceNumber: 'INV-' + Date.now().toString().slice(-6)
+      };
+
+      const response = await fetch('/api/generate-premium-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(invoiceData),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `invoice-${invoiceData.invoiceNumber}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        console.error('Failed to generate invoice');
+      }
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -638,6 +695,28 @@ export default function Dashboard() {
                                       Body text - Regular
                                     </p>
                                   </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="mt-8 flex justify-center space-x-4">
+                                  <button 
+                                    onClick={() => setShowInvoiceBuilder(false)}
+                                    className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-xl font-medium transition-colors duration-200"
+                                  >
+                                    Save Draft
+                                  </button>
+                                  <button 
+                                    onClick={generatePremiumInvoice}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-medium transition-colors duration-200"
+                                  >
+                                    Generate PDF
+                                  </button>
+                                  <button 
+                                    onClick={() => setShowInvoiceBuilder(false)}
+                                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-medium transition-colors duration-200"
+                                  >
+                                    Send Invoice
+                                  </button>
                                 </div>
                               </div>
                             </div>
