@@ -332,8 +332,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Stitches - Professional Invoices in Seconds</title>
-        <meta name="description" content="Generate professional invoices instantly with AI. Support for freelancers, businesses, and all invoice types." />
+        <title>Stixches - Professional Invoices in Seconds</title>
+        <meta name="description" content="Generate professional invoices instantly with premium templates. Support for freelancers, businesses, and all invoice types." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.gstatic.com/" crossOrigin="" />
