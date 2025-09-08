@@ -5,8 +5,8 @@ export default function Terms() {
   return (
     <>
       <Head>
-        <title>Terms of Service - Stitches</title>
-        <meta name="description" content="Terms of Service for Stitches AI Invoice Generator" />
+        <title>Terms of Service - StitchesX</title>
+        <meta name="description" content="Terms of Service for StitchesX AI Invoice Generator" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -32,14 +32,14 @@ export default function Terms() {
         <div className="flex flex-col h-full grow">
           <header className="sticky top-0 z-20 glass-effect border-b border-gray-200/60">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-              <div className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-3">
                 <div className="flex items-center justify-center size-8 bg-black text-white rounded-lg">
                   <svg className="size-5" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                     <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
                   </svg>
                 </div>
-                <h2 className="text-gray-900 text-xl font-semibold leading-tight">Stitch</h2>
-              </div>
+                <h2 className="text-gray-900 text-xl font-semibold leading-tight">StitchesX</h2>
+              </Link>
               <nav className="hidden md:flex items-center gap-8">
                 <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Dashboard</Link>
                 <Link href="/invoices" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Invoices</Link>
@@ -70,13 +70,13 @@ export default function Terms() {
                     <div className="prose prose-base max-w-none text-gray-700">
                       <h2 className="text-2xl font-semibold text-gray-900">1. Acceptance of Terms</h2>
                       <p>
-                        These Terms of Service govern your use of the Stitches AI Invoice Generator. By using our services, you agree to these terms. You are responsible for maintaining the
+                        These Terms of Service govern your use of the StitchesX AI Invoice Generator. By using our services, you agree to these terms. You are responsible for maintaining the
                         confidentiality of your account and password. You agree not to use our services for any unlawful or prohibited purpose.
                       </p>
                       
                       <h2 className="mt-8 text-2xl font-semibold text-gray-900">2. Service Description</h2>
                       <p>
-                        Stitches provides an AI-powered invoice generation service that allows users to create professional invoices using artificial intelligence technology. Our service includes
+                        StitchesX provides an AI-powered invoice generation service that allows users to create professional invoices using artificial intelligence technology. Our service includes
                         invoice templates, automated calculations, and PDF generation capabilities.
                       </p>
                       
@@ -89,7 +89,7 @@ export default function Terms() {
                       <h2 className="mt-8 text-2xl font-semibold text-gray-900">4. Prohibited Uses</h2>
                       <p>
                         You may not use the service for any illegal or unauthorized purpose. You must not, in the use of the Service, violate any laws in your jurisdiction (including but not limited to copyright laws).
-                        Violation of any of these agreements will result in the termination of your Stitches Account.
+                        Violation of any of these agreements will result in the termination of your StitchesX Account.
                       </p>
                       
                       <h2 className="mt-8 text-2xl font-semibold text-gray-900">5. Service Availability</h2>
@@ -100,7 +100,7 @@ export default function Terms() {
                       
                       <h2 className="mt-8 text-2xl font-semibold text-gray-900">6. Limitation of Liability</h2>
                       <p>
-                        While Stitches prohibits such conduct and content on the Service, you understand and agree that Stitches cannot be responsible for the Content posted on the Service and you nonetheless may be exposed to such materials. 
+                        While StitchesX prohibits such conduct and content on the Service, you understand and agree that StitchesX cannot be responsible for the Content posted on the Service and you nonetheless may be exposed to such materials. 
                         You agree to use the Service at your own risk.
                       </p>
                       
@@ -111,7 +111,7 @@ export default function Terms() {
                       
                       <h2 className="mt-8 text-2xl font-semibold text-gray-900">8. Contact Information</h2>
                       <p>
-                        For any questions or concerns regarding these Terms of Service, please contact us at support@stitches.com.
+                        For any questions or concerns regarding these Terms of Service, please contact us at support@stitchesx.com.
                       </p>
                     </div>
                   </div>

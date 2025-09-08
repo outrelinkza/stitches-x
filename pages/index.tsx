@@ -400,7 +400,7 @@ export default function Home() {
           <main className="flex flex-1 justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="w-full max-w-4xl space-y-8">
               <div className="text-center">
-                <h1 className="text-4xl font-bold tracking-tighter text-slate-900">Stitches</h1>
+                <h1 className="text-4xl font-bold tracking-tighter text-slate-900">StitchesX</h1>
                 <p className="mt-2 text-lg text-slate-600">Create professional invoices with ease, powered by AI.</p>
               </div>
 

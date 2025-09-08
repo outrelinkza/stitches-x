@@ -5,8 +5,8 @@ export default function Privacy() {
   return (
     <>
       <Head>
-        <title>Privacy Policy - Stitches</title>
-        <meta name="description" content="Privacy Policy for Stitches AI Invoice Generator" />
+        <title>Privacy Policy - StitchesX</title>
+        <meta name="description" content="Privacy Policy for StitchesX AI Invoice Generator" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -32,14 +32,14 @@ export default function Privacy() {
         <div className="flex flex-col h-full grow">
           <header className="sticky top-0 z-20 glass-effect border-b border-gray-200/60">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-              <div className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-3">
                 <div className="flex items-center justify-center size-8 bg-black text-white rounded-lg">
                   <svg className="size-5" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                     <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
                   </svg>
                 </div>
-                <h2 className="text-gray-900 text-xl font-semibold leading-tight">Stitch</h2>
-              </div>
+                <h2 className="text-gray-900 text-xl font-semibold leading-tight">StitchesX</h2>
+              </Link>
               <nav className="hidden md:flex items-center gap-8">
                 <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Dashboard</Link>
                 <Link href="/invoices" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Invoices</Link>
@@ -70,7 +70,7 @@ export default function Privacy() {
                     <div className="prose prose-base max-w-none text-gray-700">
                       <h2 className="text-2xl font-semibold text-gray-900">1. Information We Collect</h2>
                       <p>
-                        At Stitches, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and disclose your information when you use our AI Invoice
+                        At StitchesX, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and disclose your information when you use our AI Invoice
                         Generator. We collect information such as your name, email address, and payment details to provide our services.
                       </p>
                       
@@ -96,7 +96,7 @@ export default function Privacy() {
                       
                       <h2 className="mt-8 text-2xl font-semibold text-gray-900">6. Your Rights</h2>
                       <p>
-                        You have the right to access, update, or delete your personal information. You can also opt out of certain communications from us. To exercise these rights, please contact us at support@stitches.com.
+                        You have the right to access, update, or delete your personal information. You can also opt out of certain communications from us. To exercise these rights, please contact us at support@stitchesx.com.
                       </p>
                       
                       <h2 className="mt-8 text-2xl font-semibold text-gray-900">7. Data Retention</h2>
@@ -111,7 +111,7 @@ export default function Privacy() {
                       
                       <h2 className="mt-8 text-2xl font-semibold text-gray-900">9. Contact Us</h2>
                       <p>
-                        By using our services, you agree to the terms of this Privacy Policy. For any questions or concerns, please contact us at support@stitches.com.
+                        By using our services, you agree to the terms of this Privacy Policy. For any questions or concerns, please contact us at support@stitchesx.com.
                       </p>
                     </div>
                   </div>
