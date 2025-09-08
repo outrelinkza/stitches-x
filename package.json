@@ -1,7 +1,7 @@
 {
-  "name": "ai-invoice-generator",
+  "name": "stitches",
   "version": "1.0.0",
-  "description": "Universal AI-powered invoice generator with Stripe payments",
+  "description": "Professional invoice generator with premium templates and branding",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
