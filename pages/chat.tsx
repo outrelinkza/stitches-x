@@ -89,7 +89,7 @@ export default function ChatInvoice() {
   return (
     <>
       <Head>
-        <title>Stitches - AI Chat Invoice Generator</title>
+        <title>StitchesX - AI Chat Invoice Generator</title>
         <meta name="description" content="Generate invoices through natural conversation with AI" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>

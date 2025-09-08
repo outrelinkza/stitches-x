@@ -114,8 +114,8 @@ export default function Auth() {
   return (
     <>
       <Head>
-        <title>Stitches - {isLogin ? 'Sign In' : 'Sign Up'}</title>
-        <meta name="description" content="Sign in or create an account with Stitches" />
+        <title>StitchesX - {isLogin ? 'Sign In' : 'Sign Up'}</title>
+        <meta name="description" content="Sign in or create an account with StitchesX" />
         <link rel="preconnect" href="https://fonts.gstatic.com/" crossOrigin="" />
         <link
           as="style"
@@ -130,19 +130,19 @@ export default function Auth() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
+            <Link href="/" className="flex items-center justify-center gap-3 mb-4 hover:opacity-80 transition-opacity">
               <div className="flex items-center justify-center size-8 bg-black text-white rounded-lg">
                 <svg className="size-5" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                   <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Stitches</h1>
-            </div>
+              <span className="text-2xl font-bold text-gray-900">StitchesX</span>
+            </Link>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               {isLogin ? 'Welcome back' : 'Create your account'}
             </h2>
             <p className="text-gray-600">
-              {isLogin ? 'Sign in to your account to continue' : 'Get started with Stitches today'}
+              {isLogin ? 'Sign in to your account to continue' : 'Get started with StitchesX today'}
             </p>
           </div>
 

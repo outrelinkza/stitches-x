@@ -61,7 +61,7 @@ export default function TwoFactorAuth() {
   return (
     <>
       <Head>
-        <title>Stitches - Two-Factor Authentication</title>
+        <title>StitchesX - Two-Factor Authentication</title>
         <meta name="description" content="Complete two-factor authentication" />
         <link rel="preconnect" href="https://fonts.gstatic.com/" crossOrigin="" />
         <link

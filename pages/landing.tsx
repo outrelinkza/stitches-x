@@ -6,7 +6,7 @@ export default function LandingPage() {
   return (
     <>
       <Head>
-        <title>Stitches - Professional Invoice Generator</title>
+        <title>StitchesX - Professional Invoice Generator</title>
         <meta name="description" content="Create beautiful, professional invoices with AI-powered features. Customize templates, add your branding, and get paid faster." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -17,11 +17,11 @@ export default function LandingPage() {
         <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
-              <div className="flex items-center">
+              <Link href="/" className="flex items-center">
                 <div className="flex-shrink-0">
-                  <h1 className="text-2xl font-bold text-gray-900">Stitches</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">StitchesX</h1>
                 </div>
-              </div>
+              </Link>
               <div className="flex items-center space-x-4">
                 <Link href="/auth" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
                   Sign In

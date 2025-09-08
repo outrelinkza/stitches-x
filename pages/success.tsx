@@ -107,7 +107,7 @@ export default function Success() {
   return (
     <>
       <Head>
-        <title>Payment Success - Stitches</title>
+        <title>Payment Success - StitchesX</title>
         <meta name="description" content="Payment successful for your AI-generated invoice" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>

@@ -77,7 +77,7 @@ export default function Templates() {
   return (
     <>
       <Head>
-        <title>Templates - Stitches</title>
+        <title>Templates - StitchesX</title>
         <meta name="description" content="Manage your invoice templates and designs" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

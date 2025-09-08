@@ -33,7 +33,7 @@ export default function ForgotPassword() {
   return (
     <>
       <Head>
-        <title>Stitches - Forgot Password</title>
+        <title>StitchesX - Forgot Password</title>
         <meta name="description" content="Reset your password" />
         <link rel="preconnect" href="https://fonts.gstatic.com/" crossOrigin="" />
         <link

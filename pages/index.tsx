@@ -55,8 +55,8 @@ export default function Home() {
   useEffect(() => {
     if (router.query.template) {
       setSelectedTemplate(router.query.template as string);
-      // Show a success message
-      alert(`Template "${router.query.template}" is now active!`);
+      // Show a success notification instead of alert
+      setNotification({ type: 'success', message: `Template "${router.query.template}" is now active!` });
     }
   }, [router.query.template]);
   
