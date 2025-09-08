@@ -129,10 +129,43 @@ export default function Dashboard() {
                         {/* Step Navigation */}
                         <div className="flex items-center justify-center space-x-4 mb-8">
                           {[
-                            { id: 'template', name: 'Template', icon: '🎨' },
-                            { id: 'branding', name: 'Branding', icon: '🖼️' },
-                            { id: 'details', name: 'Details', icon: '📝' },
-                            { id: 'preview', name: 'Preview', icon: '👁️' }
+                            { 
+                              id: 'template', 
+                              name: 'Template', 
+                              icon: (
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                                </svg>
+                              )
+                            },
+                            { 
+                              id: 'branding', 
+                              name: 'Branding', 
+                              icon: (
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              )
+                            },
+                            { 
+                              id: 'details', 
+                              name: 'Details', 
+                              icon: (
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                              )
+                            },
+                            { 
+                              id: 'preview', 
+                              name: 'Preview', 
+                              icon: (
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                              )
+                            }
                           ].map((step, index) => (
                             <div key={step.id} className="flex items-center">
                               <button
@@ -143,7 +176,7 @@ export default function Dashboard() {
                                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                               >
-                                <span className="text-lg">{step.icon}</span>
+                                {step.icon}
                                 <span className="font-medium">{step.name}</span>
                               </button>
                               {index < 3 && (
@@ -200,29 +233,96 @@ export default function Dashboard() {
                                   }`}
                                 >
                                   <div className="aspect-[3/4] bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-                                    <div className="p-4 h-full flex flex-col">
-                                      <div className="bg-white rounded-lg shadow-sm p-4 h-full">
-                                        <div className="flex justify-between items-center mb-4">
-                                          <div className={`w-16 h-8 bg-gradient-to-r ${template.color} rounded`}></div>
-                                          <div className="text-xs text-gray-500">INV-001</div>
-                                        </div>
+                                    <div className="p-3 h-full flex flex-col">
+                                      <div className="bg-white rounded-lg shadow-sm p-3 h-full">
+                                        {/* Template-specific designs */}
+                                        {template.id === 'modern-minimal' && (
+                                          <>
+                                            <div className="flex justify-between items-center mb-3">
+                                              <div className="w-12 h-6 bg-blue-600 rounded"></div>
+                                              <div className="text-xs text-gray-500 font-mono">INV-001</div>
+                                            </div>
+                                            <div className="space-y-2">
+                                              <div className="h-1.5 bg-gray-300 rounded w-3/4"></div>
+                                              <div className="h-1.5 bg-gray-300 rounded w-1/2"></div>
+                                              <div className="h-1.5 bg-gray-300 rounded w-2/3"></div>
+                                            </div>
+                                            <div className="mt-4 space-y-1">
+                                              <div className="h-1 bg-gray-200 rounded"></div>
+                                              <div className="h-1 bg-gray-200 rounded w-4/5"></div>
+                                            </div>
+                                            <div className="mt-4 flex justify-between">
+                                              <div className="h-1.5 bg-gray-300 rounded w-1/3"></div>
+                                              <div className="h-1.5 bg-blue-600 rounded w-1/4"></div>
+                                            </div>
+                                          </>
+                                        )}
                                         
-                                        <div className="space-y-3">
-                                          <div className="h-2 bg-gray-200 rounded w-3/4"></div>
-                                          <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-                                          <div className="h-2 bg-gray-200 rounded w-2/3"></div>
-                                        </div>
+                                        {template.id === 'corporate-classic' && (
+                                          <>
+                                            <div className="flex justify-between items-center mb-3">
+                                              <div className="w-12 h-6 bg-gray-700 rounded-sm"></div>
+                                              <div className="text-xs text-gray-600 font-serif">INV-001</div>
+                                            </div>
+                                            <div className="border-t border-gray-300 pt-2 space-y-2">
+                                              <div className="h-1.5 bg-gray-400 rounded w-4/5"></div>
+                                              <div className="h-1.5 bg-gray-400 rounded w-3/5"></div>
+                                              <div className="h-1.5 bg-gray-400 rounded w-5/6"></div>
+                                            </div>
+                                            <div className="mt-4 border-t border-gray-200 pt-2 space-y-1">
+                                              <div className="h-1 bg-gray-300 rounded w-full"></div>
+                                              <div className="h-1 bg-gray-300 rounded w-3/4"></div>
+                                            </div>
+                                            <div className="mt-4 border-t border-gray-300 pt-2 flex justify-between">
+                                              <div className="h-1.5 bg-gray-400 rounded w-1/3"></div>
+                                              <div className="h-1.5 bg-gray-700 rounded w-1/4"></div>
+                                            </div>
+                                          </>
+                                        )}
                                         
-                                        <div className="mt-6 space-y-2">
-                                          <div className="h-1 bg-gray-200 rounded"></div>
-                                          <div className="h-1 bg-gray-200 rounded w-4/5"></div>
-                                          <div className="h-1 bg-gray-200 rounded w-3/5"></div>
-                                        </div>
+                                        {template.id === 'creative-bold' && (
+                                          <>
+                                            <div className="flex justify-between items-center mb-3">
+                                              <div className="w-12 h-6 bg-purple-600 rounded-full"></div>
+                                              <div className="text-xs text-purple-600 font-bold">INV-001</div>
+                                            </div>
+                                            <div className="space-y-2">
+                                              <div className="h-1.5 bg-purple-200 rounded-full w-3/4"></div>
+                                              <div className="h-1.5 bg-purple-200 rounded-full w-1/2"></div>
+                                              <div className="h-1.5 bg-purple-200 rounded-full w-2/3"></div>
+                                            </div>
+                                            <div className="mt-4 space-y-1">
+                                              <div className="h-1 bg-purple-100 rounded-full"></div>
+                                              <div className="h-1 bg-purple-100 rounded-full w-4/5"></div>
+                                            </div>
+                                            <div className="mt-4 flex justify-between">
+                                              <div className="h-1.5 bg-purple-200 rounded-full w-1/3"></div>
+                                              <div className="h-1.5 bg-purple-600 rounded-full w-1/4"></div>
+                                            </div>
+                                          </>
+                                        )}
                                         
-                                        <div className="mt-6 flex justify-between">
-                                          <div className="h-2 bg-gray-200 rounded w-1/3"></div>
-                                          <div className={`h-2 bg-gradient-to-r ${template.color} rounded w-1/4`}></div>
-                                        </div>
+                                        {template.id === 'elegant-luxury' && (
+                                          <>
+                                            <div className="flex justify-between items-center mb-3">
+                                              <div className="w-12 h-6 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded"></div>
+                                              <div className="text-xs text-yellow-600 font-light">INV-001</div>
+                                            </div>
+                                            <div className="space-y-2">
+                                              <div className="h-1.5 bg-yellow-100 rounded w-4/5"></div>
+                                              <div className="h-1.5 bg-yellow-100 rounded w-3/5"></div>
+                                              <div className="h-1.5 bg-yellow-100 rounded w-5/6"></div>
+                                            </div>
+                                            <div className="mt-4 space-y-1">
+                                              <div className="h-1 bg-yellow-50 rounded"></div>
+                                              <div className="h-1 bg-yellow-50 rounded w-4/5"></div>
+                                            </div>
+                                            <div className="mt-4 flex justify-between">
+                                              <div className="h-1.5 bg-yellow-100 rounded w-1/3"></div>
+                                              <div className="h-1.5 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded w-1/4"></div>
+                                            </div>
+                                          </>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -306,35 +406,181 @@ export default function Dashboard() {
                           <div>
                             <h3 className="text-xl font-semibold text-gray-900 mb-6">Invoice Preview</h3>
                             <div className="bg-gray-50 rounded-lg p-6">
-                              <div className="bg-white rounded-lg shadow-sm p-6 max-w-2xl mx-auto">
-                                <div className="flex justify-between items-center mb-6">
-                                  {branding.logo && (
-                                    <img src={branding.logo} alt="Logo" className="h-8" />
-                                  )}
-                                  <div className="text-sm text-gray-500">INV-001</div>
-                                </div>
-                                
-                                <div className="space-y-4">
-                                  <div>
-                                    <h2 
-                                      className="text-xl font-bold"
+                              <div className="bg-white rounded-lg shadow-sm p-8 max-w-2xl mx-auto">
+                                {/* Template-specific preview */}
+                                {selectedTemplate === 'modern-minimal' && (
+                                  <>
+                                    <div className="flex justify-between items-center mb-8">
+                                      {branding.logo && (
+                                        <img src={branding.logo} alt="Logo" className="h-10" />
+                                      )}
+                                      <div className="text-sm text-gray-500 font-mono">INV-001</div>
+                                    </div>
+                                    
+                                    <div className="space-y-6">
+                                      <div>
+                                        <h2 
+                                          className="text-2xl font-bold mb-2"
+                                          style={{ 
+                                            fontFamily: branding.fontFamily,
+                                            color: branding.primaryColor 
+                                          }}
+                                        >
+                                          {branding.companyName || 'Your Company'}
+                                        </h2>
+                                        {branding.tagline && (
+                                          <p className="text-gray-600">{branding.tagline}</p>
+                                        )}
+                                      </div>
+                                      
+                                      <div className="text-sm text-gray-600 space-y-1">
+                                        {branding.address && <p>{branding.address}</p>}
+                                        {branding.phone && <p>{branding.phone}</p>}
+                                        {branding.email && <p>{branding.email}</p>}
+                                        {branding.website && <p>{branding.website}</p>}
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+
+                                {selectedTemplate === 'corporate-classic' && (
+                                  <>
+                                    <div className="border-b border-gray-300 pb-4 mb-6">
+                                      <div className="flex justify-between items-center">
+                                        {branding.logo && (
+                                          <img src={branding.logo} alt="Logo" className="h-10" />
+                                        )}
+                                        <div className="text-sm text-gray-600 font-serif">INV-001</div>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                      <div>
+                                        <h2 
+                                          className="text-2xl font-bold mb-2"
+                                          style={{ 
+                                            fontFamily: 'serif',
+                                            color: branding.primaryColor 
+                                          }}
+                                        >
+                                          {branding.companyName || 'Your Company'}
+                                        </h2>
+                                        {branding.tagline && (
+                                          <p className="text-gray-600 font-serif">{branding.tagline}</p>
+                                        )}
+                                      </div>
+                                      
+                                      <div className="text-sm text-gray-600 space-y-1 font-serif">
+                                        {branding.address && <p>{branding.address}</p>}
+                                        {branding.phone && <p>{branding.phone}</p>}
+                                        {branding.email && <p>{branding.email}</p>}
+                                        {branding.website && <p>{branding.website}</p>}
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+
+                                {selectedTemplate === 'creative-bold' && (
+                                  <>
+                                    <div className="flex justify-between items-center mb-8">
+                                      {branding.logo && (
+                                        <img src={branding.logo} alt="Logo" className="h-10" />
+                                      )}
+                                      <div className="text-sm font-bold" style={{ color: branding.primaryColor }}>INV-001</div>
+                                    </div>
+                                    
+                                    <div className="space-y-6">
+                                      <div>
+                                        <h2 
+                                          className="text-2xl font-bold mb-2"
+                                          style={{ 
+                                            fontFamily: branding.fontFamily,
+                                            color: branding.primaryColor 
+                                          }}
+                                        >
+                                          {branding.companyName || 'Your Company'}
+                                        </h2>
+                                        {branding.tagline && (
+                                          <p className="text-gray-600 font-semibold">{branding.tagline}</p>
+                                        )}
+                                      </div>
+                                      
+                                      <div className="text-sm text-gray-600 space-y-1 font-medium">
+                                        {branding.address && <p>{branding.address}</p>}
+                                        {branding.phone && <p>{branding.phone}</p>}
+                                        {branding.email && <p>{branding.email}</p>}
+                                        {branding.website && <p>{branding.website}</p>}
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+
+                                {selectedTemplate === 'elegant-luxury' && (
+                                  <>
+                                    <div className="flex justify-between items-center mb-8">
+                                      {branding.logo && (
+                                        <img src={branding.logo} alt="Logo" className="h-10" />
+                                      )}
+                                      <div className="text-sm font-light" style={{ color: branding.primaryColor }}>INV-001</div>
+                                    </div>
+                                    
+                                    <div className="space-y-6">
+                                      <div>
+                                        <h2 
+                                          className="text-2xl font-light mb-2"
+                                          style={{ 
+                                            fontFamily: 'serif',
+                                            color: branding.primaryColor 
+                                          }}
+                                        >
+                                          {branding.companyName || 'Your Company'}
+                                        </h2>
+                                        {branding.tagline && (
+                                          <p className="text-gray-600 font-light">{branding.tagline}</p>
+                                        )}
+                                      </div>
+                                      
+                                      <div className="text-sm text-gray-600 space-y-1 font-light">
+                                        {branding.address && <p>{branding.address}</p>}
+                                        {branding.phone && <p>{branding.phone}</p>}
+                                        {branding.email && <p>{branding.email}</p>}
+                                        {branding.website && <p>{branding.website}</p>}
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+
+                                {/* Typography Preview */}
+                                <div className="mt-8 pt-6 border-t border-gray-200">
+                                  <h4 className="text-sm font-medium text-gray-700 mb-3">Typography Preview</h4>
+                                  <div className="space-y-2">
+                                    <p 
+                                      className="text-lg font-bold"
                                       style={{ 
                                         fontFamily: branding.fontFamily,
                                         color: branding.primaryColor 
                                       }}
                                     >
-                                      {branding.companyName || 'Your Company'}
-                                    </h2>
-                                    {branding.tagline && (
-                                      <p className="text-sm text-gray-600">{branding.tagline}</p>
-                                    )}
-                                  </div>
-                                  
-                                  <div className="text-sm text-gray-600 space-y-1">
-                                    {branding.address && <p>{branding.address}</p>}
-                                    {branding.phone && <p>{branding.phone}</p>}
-                                    {branding.email && <p>{branding.email}</p>}
-                                    {branding.website && <p>{branding.website}</p>}
+                                      Company Name - Bold
+                                    </p>
+                                    <p 
+                                      className="text-base font-medium"
+                                      style={{ 
+                                        fontFamily: branding.fontFamily,
+                                        color: branding.secondaryColor 
+                                      }}
+                                    >
+                                      Subtitle - Medium
+                                    </p>
+                                    <p 
+                                      className="text-sm"
+                                      style={{ 
+                                        fontFamily: branding.fontFamily,
+                                        color: '#6B7280'
+                                      }}
+                                    >
+                                      Body text - Regular
+                                    </p>
                                   </div>
                                 </div>
                               </div>
