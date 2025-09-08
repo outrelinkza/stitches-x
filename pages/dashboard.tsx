@@ -77,51 +77,6 @@ export default function Dashboard() {
         <div className="layout-container flex h-full grow flex-col">
           <Header currentPage="/dashboard" />
           
-          {/* Floating Navigation Button */}
-          {showInvoiceBuilder && (
-            <div className="fixed top-20 right-6 z-50">
-              <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-2">
-                <div className="flex flex-col gap-2">
-                  <Link 
-                    href="/dashboard" 
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-                    </svg>
-                    Dashboard
-                  </Link>
-                  <Link 
-                    href="/" 
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Simple Invoice
-                  </Link>
-                  <Link 
-                    href="/invoices" 
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    Invoices
-                  </Link>
-                  <Link 
-                    href="/templates" 
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-                    </svg>
-                    Templates
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
 
           <main className="flex flex-1 justify-center py-10 px-4 sm:px-6 lg:px-8">
             <div className="layout-content-container flex flex-col max-w-6xl w-full">
@@ -224,26 +179,6 @@ export default function Dashboard() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                             <span className="text-gray-900 font-medium capitalize">{currentStep}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <Link 
-                              href="/" 
-                              className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
-                            >
-                              Simple Invoice
-                            </Link>
-                            <Link 
-                              href="/invoices" 
-                              className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
-                            >
-                              Invoices
-                            </Link>
-                            <Link 
-                              href="/templates" 
-                              className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
-                            >
-                              Templates
-                            </Link>
                           </div>
                         </div>
 
