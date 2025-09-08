@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import InvoiceTemplates from './InvoiceTemplates';
 import BrandingCustomization from './BrandingCustomization';
 
@@ -138,14 +139,107 @@ export default function InvoiceBuilder() {
   }, [invoiceData.items, invoiceData.taxRate]);
 
   const steps = [
-    { id: 'template', name: 'Template', icon: '🎨' },
-    { id: 'branding', name: 'Branding', icon: '🖼️' },
-    { id: 'details', name: 'Details', icon: '📝' },
-    { id: 'preview', name: 'Preview', icon: '👁️' }
+    { 
+      id: 'template', 
+      name: 'Template', 
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+        </svg>
+      )
+    },
+    { 
+      id: 'branding', 
+      name: 'Branding', 
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
+    },
+    { 
+      id: 'details', 
+      name: 'Details', 
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      )
+    },
+    { 
+      id: 'preview', 
+      name: 'Preview', 
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      )
+    }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Navigation Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo and Brand */}
+            <div className="flex items-center space-x-4">
+              <Link href="/dashboard" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <span className="text-xl font-bold text-gray-900">Stitches</span>
+              </Link>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="flex items-center space-x-6">
+              <Link 
+                href="/dashboard" 
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+              >
+                Dashboard
+              </Link>
+              <Link 
+                href="/" 
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+              >
+                Simple Invoice
+              </Link>
+              <Link 
+                href="/invoices" 
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+              >
+                Invoices
+              </Link>
+              <Link 
+                href="/templates" 
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+              >
+                Templates
+              </Link>
+            </div>
+
+            {/* Back Button */}
+            <div className="flex items-center space-x-4">
+              <Link 
+                href="/dashboard"
+                className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span>Back to Dashboard</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -171,7 +265,7 @@ export default function InvoiceBuilder() {
                       : 'bg-white text-gray-600 hover:bg-gray-50 shadow-sm'
                   }`}
                 >
-                  <span className="text-2xl">{step.icon}</span>
+                  <div className="flex-shrink-0">{step.icon}</div>
                   <div className="text-left">
                     <div className="font-medium">{step.name}</div>
                     <div className="text-xs opacity-75">Step {index + 1}</div>
