@@ -805,11 +805,11 @@ export default function Home() {
           <footer className="mt-auto py-8 px-10">
             <div className="container mx-auto text-center text-sm text-slate-500">
               <div className="flex justify-center items-center space-x-6">
-                <a className="hover:text-slate-800" href="#">Terms of Service</a>
-                <a className="hover:text-slate-800" href="#">Privacy Policy</a>
-                <a className="hover:text-slate-800" href="#">Contact Us</a>
+                <a className="hover:text-slate-800" href="/terms">Terms of Service</a>
+                <a className="hover:text-slate-800" href="/privacy">Privacy Policy</a>
+                <a className="hover:text-slate-800" href="/contact">Contact Us</a>
               </div>
-              <p className="mt-4">© 2024 Stitches. All rights reserved.</p>
+              <p className="mt-4">© 2025 StitchesX. All rights reserved.</p>
             </div>
           </footer>
         </div>
