@@ -14,7 +14,7 @@ export default function Dashboard() {
   const [selectedTemplate, setSelectedTemplate] = useState('modern-minimal');
   const [currentStep, setCurrentStep] = useState<'template' | 'branding' | 'details' | 'preview'>('template');
   const [branding, setBranding] = useState({
-    logo: null,
+    logo: null as string | null,
     primaryColor: '#2563eb',
     secondaryColor: '#1e40af',
     fontFamily: 'Inter',
