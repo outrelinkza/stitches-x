@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -35,6 +35,11 @@ interface Invoice {
 
 export default function Home() {
   const router = useRouter();
+  
+  // Redirect to landing page
+  React.useEffect(() => {
+    router.push('/landing');
+  }, [router]);
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
