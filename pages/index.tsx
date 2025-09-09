@@ -150,12 +150,14 @@ export default function Home() {
     number: `INV-${Date.now()}`,
     date: new Date().toISOString().split('T')[0],
     dueDate: '',
-    currency: 'USD',
+    currency: 'GBP',
   });
   
   const [lineItems, setLineItems] = useState<LineItem[]>([
     { description: '', quantity: 1, rate: 0, total: 0 }
   ]);
+  
+  const [taxRate, setTaxRate] = useState(10);
   
   const [additionalOptions, setAdditionalOptions] = useState({
     taxRate: 10,
