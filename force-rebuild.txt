@@ -1,0 +1,3 @@
+This file forces Vercel to rebuild the project.
+Timestamp: 2025-01-09 18:55:00
+Changes: All USD symbols changed to GBP, GDPR Rights link removed from footer
