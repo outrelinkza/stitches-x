@@ -1215,7 +1215,7 @@ export default function Home() {
                 <a className="hover:text-slate-800" href="/privacy">Privacy Policy</a>
                 <a className="hover:text-slate-800" href="/contact">Contact Us</a>
               </div>
-              <p className="mt-4">© 2025 StitchesX. All rights reserved.</p>
+              <p className="mt-4">© 2025 StitchesX. All rights reserved. | Updated: {new Date().toISOString()}</p>
             </div>
           </footer>
         </div>
