@@ -4,8 +4,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   
-  // Enable static export for Vercel
-  output: 'export',
+  // Remove static export to enable API routes
+  // output: 'export', // This was causing API routes to not work
+  
   trailingSlash: true,
   
   // Disable image optimization for static export
