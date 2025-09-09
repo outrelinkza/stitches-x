@@ -848,7 +848,7 @@ export default function Home() {
                             value={item.rate}
                             onChange={(e) => updateLineItem(index, 'rate', Number(e.target.value))}
                           />
-                          <span className="col-span-2 text-sm text-slate-800">${item.total.toFixed(2)}</span>
+                          <span className="col-span-2 text-sm text-slate-800">£{item.total.toFixed(2)}</span>
                           <button 
                             onClick={() => removeLineItem(index)}
                             className="col-span-1 text-slate-500 hover:text-red-500 transition-transform duration-200 hover:scale-110"
@@ -902,7 +902,7 @@ export default function Home() {
                             value={item.rate}
                             onChange={(e) => updateLineItem(index, 'rate', Number(e.target.value))}
                           />
-                          <span className="col-span-2 text-sm text-slate-800">${item.total.toFixed(2)}</span>
+                          <span className="col-span-2 text-sm text-slate-800">£{item.total.toFixed(2)}</span>
                           <button 
                             onClick={() => removeLineItem(index)}
                             className="col-span-1 text-slate-500 hover:text-red-500 transition-transform duration-200 hover:scale-110"
@@ -1215,7 +1215,7 @@ export default function Home() {
                 <a className="hover:text-slate-800" href="/privacy">Privacy Policy</a>
                 <a className="hover:text-slate-800" href="/contact">Contact Us</a>
               </div>
-              <p className="mt-4">© 2025 StitchesX. All rights reserved. | Updated: {new Date().toISOString()}</p>
+              <p className="mt-4">© 2025 StitchesX. All rights reserved.</p>
             </div>
           </footer>
         </div>
@@ -1279,7 +1279,7 @@ export default function Home() {
                 <div className="bg-gray-50 rounded-lg p-4 mb-6">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Invoice #{generatedInvoice.number}</span>
-                    <span className="font-semibold">${generatedInvoice.total.toFixed(2)}</span>
+                    <span className="font-semibold">£{generatedInvoice.total.toFixed(2)}</span>
                   </div>
                 </div>
                 
