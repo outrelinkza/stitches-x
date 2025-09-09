@@ -182,3 +182,4 @@ The per-invoice pricing system is now fully integrated. Users can:
 ---
 
 *Need help? Check the troubleshooting section or contact support.*
+

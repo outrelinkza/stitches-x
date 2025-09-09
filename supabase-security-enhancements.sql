@@ -351,3 +351,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Grant permission for security summary
 GRANT EXECUTE ON FUNCTION public.get_user_security_summary(UUID) TO authenticated;
+

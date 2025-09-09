@@ -513,3 +513,4 @@ FROM public.profiles
 WHERE updated_at > NOW() - INTERVAL '30 days';
 
 GRANT SELECT ON public.user_stats TO authenticated;
+

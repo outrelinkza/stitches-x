@@ -169,3 +169,4 @@ UNION ALL
 SELECT 'Security Dashboard' as dashboard, * FROM public.security_dashboard
 UNION ALL
 SELECT 'User Stats' as dashboard, * FROM public.user_stats;
+

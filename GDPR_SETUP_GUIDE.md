@@ -109,3 +109,4 @@ SELECT * FROM public.check_retention_compliance();
 5. Monitor the compliance dashboard
 
 Your StitchesX app will now have enterprise-level GDPR compliance! 🎉
+

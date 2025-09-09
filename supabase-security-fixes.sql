@@ -493,3 +493,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 -- 3. Grant permissions to views (without SECURITY DEFINER)
 GRANT SELECT ON public.gdpr_compliance_dashboard TO authenticated;
 GRANT SELECT ON public.security_dashboard TO authenticated;
+

@@ -194,3 +194,4 @@ CREATE INDEX IF NOT EXISTS idx_anonymous_usage_session ON public.anonymous_usage
 
 -- 14. Test the setup
 SELECT 'Setup complete! User sign-up should now work.' as status;
+

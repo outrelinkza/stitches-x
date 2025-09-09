@@ -49,3 +49,4 @@ SENTRY_PROJECT=your_project_name
 - ✅ **Vercel monitoring** already active
 - ✅ **Supabase monitoring** already active
 - ⚠️ **Sentry** - Optional enhancement
+

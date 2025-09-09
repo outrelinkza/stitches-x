@@ -115,3 +115,4 @@ JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE n.nspname = 'public'
   AND c.relname IN ('gdpr_compliance_dashboard', 'security_dashboard', 'user_stats')
   AND c.relkind = 'v';
+

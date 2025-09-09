@@ -325,3 +325,4 @@ export const SecuritySeverity = {
   HIGH: 'high',
   CRITICAL: 'critical'
 } as const;
+

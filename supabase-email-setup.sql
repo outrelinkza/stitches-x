@@ -479,3 +479,4 @@ INSERT INTO public.email_templates (template_name, subject, html_content, text_c
 ('invoice', 'Invoice {{invoice_number}} from {{company_name}}', '<h1>Invoice {{invoice_number}}</h1><p>From: {{company_name}}</p>', 'Invoice {{invoice_number}}\n\nFrom: {{company_name}}', '{"invoice_number": "string", "company_name": "string"}'),
 ('payment_confirmation', 'Payment Confirmation - Invoice {{invoice_number}}', '<h1>Payment Confirmation</h1><p>Your payment for invoice {{invoice_number}} has been processed.</p>', 'Payment Confirmation\n\nYour payment for invoice {{invoice_number}} has been processed.', '{"invoice_number": "string"}')
 ON CONFLICT (template_name) DO NOTHING;
+

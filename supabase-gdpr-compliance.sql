@@ -301,3 +301,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Grant permission for compliance checking
 GRANT EXECUTE ON FUNCTION public.check_retention_compliance() TO authenticated;
+

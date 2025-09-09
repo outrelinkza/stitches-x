@@ -200,3 +200,4 @@ SELECT
 FROM pg_views 
 WHERE schemaname = 'public' 
   AND viewname IN ('gdpr_compliance_dashboard', 'security_dashboard', 'user_stats');
+

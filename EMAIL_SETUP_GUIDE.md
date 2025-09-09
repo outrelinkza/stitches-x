@@ -155,3 +155,4 @@ If you need help with email setup or have questions:
 3. Test email functionality with the provided functions
 
 **Your StitchesX app is now a complete, professional invoice generator with email capabilities!** ✨
+

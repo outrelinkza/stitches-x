@@ -159,3 +159,4 @@ Once the tables are created, your app will work with:
 
 ## 🚀 **After Setup:**
 Your app will have bulletproof anonymous user tracking that prevents abuse while encouraging account creation for better features!
+
