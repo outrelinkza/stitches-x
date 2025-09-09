@@ -82,7 +82,7 @@ export default function Home() {
   const checkAnonymousLimits = async () => {
     if (!authUser) {
       try {
-        const response = await fetch('/api/anonymous-tracking', {
+        const response = await fetch('/api/anonymous-tracking/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -381,7 +381,7 @@ export default function Home() {
           });
         } else {
           // Track anonymous user
-          await fetch('/api/anonymous-tracking', {
+          await fetch('/api/anonymous-tracking/', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
