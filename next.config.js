@@ -11,11 +11,8 @@ const nextConfig = {
   // Disable image optimization for static export
   images: {
     unoptimized: true
-  }
-}
-
-module.exports = nextConfig
-
+  },
+  
   // Ensure hot reload works properly
   onDemandEntries: {
     // period (in ms) where the server will keep pages in the buffer
