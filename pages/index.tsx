@@ -118,6 +118,7 @@ export default function Home() {
 
   // Initialize dynamic values on client side only to prevent hydration mismatch
   useEffect(() => {
+    setIsClient(true);
     setInvoiceDetails(prev => ({
       ...prev,
       number: `INV-${Date.now()}`,
@@ -161,6 +162,8 @@ export default function Home() {
     dueDate: '',
     currency: 'GBP',
   });
+  
+  const [isClient, setIsClient] = useState(false);
   
   const [lineItems, setLineItems] = useState<LineItem[]>([
     { description: '', quantity: 1, rate: 0, total: 0 }
@@ -773,7 +776,7 @@ export default function Home() {
                         className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400" 
                         placeholder="INV-001" 
                         type="text"
-                        value={invoiceDetails.number}
+                        value={isClient ? invoiceDetails.number : ''}
                         onChange={(e) => setInvoiceDetails({...invoiceDetails, number: e.target.value})}
                       />
                     </div>
@@ -782,7 +785,7 @@ export default function Home() {
                       <input 
                         className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800" 
                         type="date"
-                        value={invoiceDetails.date}
+                        value={isClient ? invoiceDetails.date : ''}
                         onChange={(e) => setInvoiceDetails({...invoiceDetails, date: e.target.value})}
                       />
                     </div>
