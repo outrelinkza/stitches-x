@@ -182,7 +182,7 @@ export default function TermsGDPR() {
                       
                       <h3 className="text-xl font-semibold text-gray-800 mt-6">7.2 Premium Subscription</h3>
                       <p>
-                        Premium features are available for a one-time payment of $9.99, which includes:
+                        Premium features are available for a one-time payment of £9.99, which includes:
                       </p>
                       <ul className="list-disc pl-6 mt-2">
                         <li>Unlimited invoice downloads</li>

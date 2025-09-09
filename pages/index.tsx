@@ -414,7 +414,7 @@ export default function Home() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: 9.99, // $9.99 per invoice
+            amount: 9.99, // £9.99 per invoice
             invoiceNumber: invoiceDetails.number,
           }),
         });
@@ -443,7 +443,7 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: 9.99, // $9.99 per invoice
+          amount: 9.99, // £9.99 per invoice
           invoiceNumber: invoiceDetails.number,
         }),
       });
@@ -1071,7 +1071,7 @@ export default function Home() {
                 <div className="glass-effect rounded-2xl p-8 text-center border-2 border-gray-200 hover:border-blue-300 transition-all duration-300">
                   <div className="mb-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Free</h3>
-                    <div className="text-4xl font-bold text-gray-900 mb-2">$0</div>
+                    <div className="text-4xl font-bold text-gray-900 mb-2">£0</div>
                     <p className="text-gray-600">Perfect for getting started</p>
                   </div>
                   <ul className="space-y-3 mb-8 text-left">
@@ -1115,7 +1115,7 @@ export default function Home() {
                   </div>
                   <div className="mb-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Premium</h3>
-                    <div className="text-4xl font-bold text-gray-900 mb-2">$9.99</div>
+                    <div className="text-4xl font-bold text-gray-900 mb-2">£9.99</div>
                     <p className="text-gray-600">One-time payment</p>
                   </div>
                   <ul className="space-y-3 mb-8 text-left">
