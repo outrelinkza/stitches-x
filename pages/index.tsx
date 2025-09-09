@@ -116,6 +116,15 @@ export default function Home() {
     }
   }, [authUser]);
 
+  // Initialize dynamic values on client side only to prevent hydration mismatch
+  useEffect(() => {
+    setInvoiceDetails(prev => ({
+      ...prev,
+      number: `INV-${Date.now()}`,
+      date: new Date().toISOString().split('T')[0],
+    }));
+  }, []);
+
   // Handle template parameter from URL
   useEffect(() => {
     if (router.query.template) {
@@ -147,8 +156,8 @@ export default function Home() {
   });
   
   const [invoiceDetails, setInvoiceDetails] = useState({
-    number: `INV-${Date.now()}`,
-    date: new Date().toISOString().split('T')[0],
+    number: '',
+    date: '',
     dueDate: '',
     currency: 'GBP',
   });
