@@ -749,88 +749,130 @@ export default function Home() {
                 </div>
 
                 <section className="space-y-6">
-                  <h3 className="text-lg font-semibold text-slate-800">Invoice Details</h3>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                    <label className="block">
-                      <span className="text-sm font-medium text-slate-700">Invoice Number</span>
+                  <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Invoice Details
+                  </h3>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-slate-700">Invoice Number</label>
                       <input 
-                        className="mt-1 block w-full rounded-md border-gray-300 bg-white/50 shadow-sm focus:ring-0 input-focus-glow" 
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400" 
                         placeholder="INV-001" 
                         type="text"
                         value={invoiceDetails.number}
                         onChange={(e) => setInvoiceDetails({...invoiceDetails, number: e.target.value})}
                       />
-                    </label>
-                    <label className="block">
-                      <span className="text-sm font-medium text-slate-700">Invoice Date</span>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-slate-700">Invoice Date</label>
                       <input 
-                        className="mt-1 block w-full rounded-md border-gray-300 bg-white/50 shadow-sm focus:ring-0 input-focus-glow text-slate-500" 
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800" 
                         type="date"
                         value={invoiceDetails.date}
                         onChange={(e) => setInvoiceDetails({...invoiceDetails, date: e.target.value})}
                       />
-                    </label>
-                    <label className="block">
-                      <span className="text-sm font-medium text-slate-700">Due Date</span>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-slate-700">Due Date</label>
                       <input 
-                        className="mt-1 block w-full rounded-md border-gray-300 bg-white/50 shadow-sm focus:ring-0 input-focus-glow text-slate-500" 
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800" 
                         type="date"
                         value={invoiceDetails.dueDate}
                         onChange={(e) => setInvoiceDetails({...invoiceDetails, dueDate: e.target.value})}
                       />
-                    </label>
-                    <label className="block">
-                      <span className="text-sm font-medium text-slate-700">Invoice Type</span>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-slate-700">Currency</label>
                       <select 
-                        className="mt-1 block w-full rounded-md border-gray-300 bg-white/50 shadow-sm focus:ring-0 input-focus-glow" 
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800" 
+                        value={invoiceDetails.currency}
+                        onChange={(e) => setInvoiceDetails({...invoiceDetails, currency: e.target.value})}
+                      >
+                        <option value="GBP">£ GBP (British Pound)</option>
+                        <option value="USD">$ USD (US Dollar)</option>
+                        <option value="EUR">€ EUR (Euro)</option>
+                        <option value="CAD">$ CAD (Canadian Dollar)</option>
+                        <option value="AUD">$ AUD (Australian Dollar)</option>
+                        <option value="JPY">¥ JPY (Japanese Yen)</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-slate-700">Invoice Type</label>
+                      <select 
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800" 
                         value={invoiceType}
                         onChange={(e) => setInvoiceType(e.target.value)}
                       >
-                        <option value="product_sales">Product/Sales</option>
-                        <option value="freelance_consulting">Freelance/Consulting</option>
-                        <option value="simple_receipt">Simple Receipt</option>
+                        <option value="product_sales">🛍️ Product/Sales</option>
+                        <option value="freelance_consulting">💼 Freelance/Consulting</option>
+                        <option value="simple_receipt">🧾 Simple Receipt</option>
                       </select>
-                    </label>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-slate-700">Tax Rate (%)</label>
+                      <input 
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400" 
+                        placeholder="20" 
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={taxRate}
+                        onChange={(e) => setTaxRate(Number(e.target.value))}
+                      />
+                    </div>
                   </div>
                 </section>
 
                 {invoiceType === 'product_sales' && (
-                  <section className="space-y-4">
-                    <h3 className="text-lg font-semibold text-slate-800">Line Items</h3>
+                  <section className="space-y-6">
+                    <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      Line Items
+                    </h3>
                     <div className="space-y-4">
-                      <div className="grid grid-cols-12 gap-4">
-                        <div className="col-span-5"><span className="text-sm font-medium text-slate-700">Item Description</span></div>
-                        <div className="col-span-2"><span className="text-sm font-medium text-slate-700">Quantity</span></div>
-                        <div className="col-span-2"><span className="text-sm font-medium text-slate-700">Price</span></div>
-                        <div className="col-span-2"><span className="text-sm font-medium text-slate-700">Total</span></div>
+                      <div className="grid grid-cols-12 gap-4 p-4 bg-slate-50 rounded-xl">
+                        <div className="col-span-5"><span className="text-sm font-semibold text-slate-700">Item Description</span></div>
+                        <div className="col-span-2"><span className="text-sm font-semibold text-slate-700">Quantity</span></div>
+                        <div className="col-span-2"><span className="text-sm font-semibold text-slate-700">Price</span></div>
+                        <div className="col-span-2"><span className="text-sm font-semibold text-slate-700">Total</span></div>
                       </div>
                       {lineItems.map((item, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-4 items-center">
+                        <div key={index} className="grid grid-cols-12 gap-4 items-center p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-300 transition-all duration-200">
                           <input 
-                            className="col-span-5 block w-full rounded-md border-gray-300 bg-white/50 shadow-sm focus:ring-0 input-focus-glow" 
+                            className="col-span-5 px-4 py-3 rounded-lg border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400" 
                             placeholder="e.g., iPhone 15 Pro" 
                             type="text"
                             value={item.description}
                             onChange={(e) => updateLineItem(index, 'description', e.target.value)}
                           />
                           <input 
-                            className="col-span-2 block w-full rounded-md border-gray-300 bg-white/50 shadow-sm focus:ring-0 input-focus-glow" 
+                            className="col-span-2 px-4 py-3 rounded-lg border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400" 
                             placeholder="1" 
                             type="number"
+                            min="0"
+                            step="1"
                             value={item.quantity}
                             onChange={(e) => updateLineItem(index, 'quantity', Number(e.target.value))}
                           />
                           <input 
-                            className="col-span-2 block w-full rounded-md border-gray-300 bg-white/50 shadow-sm focus:ring-0 input-focus-glow" 
+                            className="col-span-2 px-4 py-3 rounded-lg border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400" 
                             placeholder="999" 
                             type="number"
+                            min="0"
+                            step="0.01"
                             value={item.rate}
                             onChange={(e) => updateLineItem(index, 'rate', Number(e.target.value))}
                           />
-                          <span className="col-span-2 text-sm text-slate-800">£{item.total.toFixed(2)}</span>
+                          <span className="col-span-2 text-sm font-semibold text-slate-800 bg-slate-50 px-3 py-2 rounded-lg">{invoiceDetails.currency === 'GBP' ? '£' : invoiceDetails.currency === 'USD' ? '$' : invoiceDetails.currency === 'EUR' ? '€' : invoiceDetails.currency === 'JPY' ? '¥' : '$'}{item.total.toFixed(2)}</span>
                           <button 
                             onClick={() => removeLineItem(index)}
-                            className="col-span-1 text-slate-500 hover:text-red-500 transition-transform duration-200 hover:scale-110"
+                            className="col-span-1 text-slate-400 hover:text-red-500 transition-all duration-200 hover:scale-110 p-2 rounded-lg hover:bg-red-50"
                           >
                             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                               <path clipRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" fillRule="evenodd"></path>
@@ -840,9 +882,12 @@ export default function Home() {
                       ))}
                       <button 
                         onClick={addLineItem}
-                        className="text-sm font-medium text-primary hover:text-blue-700 transition-transform duration-200 hover:scale-105"
+                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl"
                       >
-                        + Add Line Item
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Add Line Item
                       </button>
                     </div>
                   </section>
@@ -881,7 +926,7 @@ export default function Home() {
                             value={item.rate}
                             onChange={(e) => updateLineItem(index, 'rate', Number(e.target.value))}
                           />
-                          <span className="col-span-2 text-sm text-slate-800">£{item.total.toFixed(2)}</span>
+                          <span className="col-span-2 text-sm text-slate-800">{invoiceDetails.currency === 'GBP' ? '£' : invoiceDetails.currency === 'USD' ? '$' : invoiceDetails.currency === 'EUR' ? '€' : invoiceDetails.currency === 'JPY' ? '¥' : '$'}{item.total.toFixed(2)}</span>
                           <button 
                             onClick={() => removeLineItem(index)}
                             className="col-span-1 text-slate-500 hover:text-red-500 transition-transform duration-200 hover:scale-110"
@@ -1258,7 +1303,7 @@ export default function Home() {
                 <div className="bg-gray-50 rounded-lg p-4 mb-6">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Invoice #{generatedInvoice.number}</span>
-                    <span className="font-semibold">£{generatedInvoice.total.toFixed(2)}</span>
+                    <span className="font-semibold">{invoiceDetails.currency === 'GBP' ? '£' : invoiceDetails.currency === 'USD' ? '$' : invoiceDetails.currency === 'EUR' ? '€' : invoiceDetails.currency === 'JPY' ? '¥' : '$'}{generatedInvoice.total.toFixed(2)}</span>
                   </div>
                 </div>
                 
