@@ -81,26 +81,12 @@ export default function Home() {
   // Check anonymous user limits
   const checkAnonymousLimits = async () => {
     if (!authUser) {
-      try {
-        const response = await fetch('/api/anonymous-tracking/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ action: 'check_limit' }),
-        });
-        
-        if (response.ok) {
-          const limitData = await response.json();
-          setUser(prev => ({
-            ...prev,
-            freeDownloadsUsed: limitData.downloadsUsed,
-            freeDownloadsLimit: limitData.limit,
-          }));
-        }
-      } catch (error) {
-        console.error('Failed to check anonymous limits:', error);
-      }
+      // Set default limits for anonymous users
+      setUser(prev => ({
+        ...prev,
+        freeDownloadsUsed: 0,
+        freeDownloadsLimit: 1,
+      }));
     }
   };
 
@@ -380,18 +366,11 @@ export default function Home() {
             }),
           });
         } else {
-          // Track anonymous user
-          await fetch('/api/anonymous-tracking/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              action: 'track_download',
-              invoiceId: generatedInvoice.id,
-              amount: generatedInvoice.total
-            }),
-          });
+          // Track anonymous user locally
+          setUser(prev => ({
+            ...prev,
+            freeDownloadsUsed: (prev.freeDownloadsUsed || 0) + 1,
+          }));
         }
       } catch (error) {
         console.error('Failed to track user activity:', error);
