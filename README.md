@@ -195,3 +195,137 @@ This project is licensed under the MIT License.
 ---
 
 Built with ❤️ using Next.js and Supabase
+
+## 📁 Project Structure
+
+```
+stitches-invoice-generator/
+├── components/          # Reusable React components
+│   ├── AuthContext.tsx  # Authentication context
+│   ├── Header.tsx       # Navigation header
+│   └── Navigation.tsx   # Main navigation
+├── lib/                 # Utility libraries
+│   └── supabase.ts      # Supabase client configuration
+├── pages/               # Next.js pages
+│   ├── api/            # API routes
+│   ├── auth.tsx        # Authentication page
+│   ├── dashboard.tsx   # User dashboard
+│   ├── index.tsx       # Main invoice form
+│   └── ...             # Other pages
+├── styles/             # Global styles
+│   └── globals.css     # TailwindCSS and custom styles
+├── supabase-schema.sql # Database schema
+└── ...                 # Configuration files
+```
+
+## 🎨 Features Overview
+
+### Authentication
+- Email/password sign-up and sign-in
+- Social authentication (Google, Apple)
+- Password reset functionality
+- Two-factor authentication support
+
+### Invoice Generation
+- **Traditional Form**: Fill out invoice details manually
+- **AI Chat**: Describe your invoice in natural language
+- **PDF Export**: Download professional PDF invoices
+- **Template System**: Customizable invoice templates
+
+### User Management
+- User profiles and settings
+- Invoice history and management
+- Client management
+- Subscription and billing
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   ```
+
+2. **Deploy to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Add environment variables
+   - Deploy!
+
+### Other Platforms
+
+- **Netlify**: Similar process, supports Next.js
+- **Railway**: Simple deployment with database
+- **AWS/GCP**: For enterprise deployments
+
+## 🔧 Configuration
+
+### Supabase Setup
+
+1. Create a new Supabase project
+2. Run the SQL schema from `supabase-schema.sql`
+3. Configure authentication settings:
+   - Site URL: `https://your-domain.com`
+   - Redirect URLs: Add your domain + `/auth/callback`
+
+### Stripe Setup
+
+1. Create a Stripe account
+2. Get your API keys from the dashboard
+3. Add webhook endpoints for payment processing
+
+### OpenAI Setup
+
+1. Get an API key from OpenAI
+2. Add to environment variables
+3. Configure usage limits
+
+## 📱 Usage
+
+1. **Sign Up**: Create an account or sign in
+2. **Create Invoice**: Use the form or AI chat
+3. **Generate PDF**: Download your invoice
+4. **Manage**: View history, edit templates, manage clients
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+- **Documentation**: Check this README
+- **Issues**: Open a GitHub issue
+- **Email**: Contact support
+
+## 🎯 Roadmap
+
+- [ ] Advanced template editor
+- [ ] Multi-language support
+- [ ] Advanced analytics
+- [ ] Mobile app
+- [ ] API for third-party integrations
+
+---
+
+Built with ❤️ using Next.js and Supabase
+- Next.js 14
+- TypeScript
+- Tailwind CSS
+- OpenAI API
+- jsPDF
+- Stripe
+- Vercel (deployment)
+
+## License
+
+MIT

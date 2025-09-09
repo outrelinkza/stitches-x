@@ -10,27 +10,31 @@ export default function Onboarding() {
   const steps = [
     {
       id: 1,
-      title: "Welcome to Stitches",
+      title: "Welcome to StitchesX",
       description: "Let's get you started with creating your first invoice. This quick tour will guide you through the basics.",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAp6UHwVsTPqJSdaIKUQPViZ8pVoosVd8BsYPUxUDuqQZEMiTbdyk6W4kI3EqhfMt6kmkucIzoLPuEdg67Ko6YoDGiewwjPuNirFvSr2Cuaj5cSFWXcGSa6qKQYNMAZ5YXS9pm3loYh7GO4TOk0hHAp_43bpbn7854MA4XVxXcAqNo3DhtuEoPS78vXbpsx7JRsDQzutqizk--UqPyD12WTB9fzJuxWYLUFKxiVSmOBcu7Rpx_HHMd2VOwaiHQAsK3h1UXPjFUmVo"
+      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
+      icon: "📊"
     },
     {
       id: 2,
       title: "Create Professional Invoices",
       description: "Design beautiful, professional invoices with our easy-to-use template system. Customize colors, fonts, and layouts to match your brand.",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAp6UHwVsTPqJSdaIKUQPViZ8pVoosVd8BsYPUxUDuqQZEMiTbdyk6W4kI3EqhfMt6kmkucIzoLPuEdg67Ko6YoDGiewwjPuNirFvSr2Cuaj5cSFWXcGSa6qKQYNMAZ5YXS9pm3loYh7GO4TOk0hHAp_43bpbn7854MA4XVxXcAqNo3DhtuEoPS78vXbpsx7JRsDQzutqizk--UqPyD12WTB9fzJuxWYLUFKxiVSmOBcu7Rpx_HHMd2VOwaiHQAsK3h1UXPjFUmVo"
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
+      icon: "🎨"
     },
     {
       id: 3,
-      title: "AI-Powered Invoice Generation",
-      description: "Use our AI chat feature to create invoices naturally. Just describe what you need, and our AI will generate a professional invoice for you.",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAp6UHwVsTPqJSdaIKUQPViZ8pVoosVd8BsYPUxUDuqQZEMiTbdyk6W4kI3EqhfMt6kmkucIzoLPuEdg67Ko6YoDGiewwjPuNirFvSr2Cuaj5cSFWXcGSa6qKQYNMAZ5YXS9pm3loYh7GO4TOk0hHAp_43bpbn7854MA4XVxXcAqNo3DhtuEoPS78vXbpsx7JRsDQzutqizk--UqPyD12WTB9fzJuxWYLUFKxiVSmOBcu7Rpx_HHMd2VOwaiHQAsK3h1UXPjFUmVo"
+      title: "Smart Invoice Generation",
+      description: "Create invoices in seconds with our intelligent form system. Just fill in the details and watch your professional invoice come to life.",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80",
+      icon: "⚡"
     },
     {
       id: 4,
       title: "Track & Manage Everything",
       description: "Keep track of all your invoices, clients, and payments in one place. Get insights with our analytics dashboard and never miss a payment.",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAp6UHwVsTPqJSdaIKUQPViZ8pVoosVd8BsYPUxUDuqQZEMiTbdyk6W4kI3EqhfMt6kmkucIzoLPuEdg67Ko6YoDGiewwjPuNirFvSr2Cuaj5cSFWXcGSa6qKQYNMAZ5YXS9pm3loYh7GO4TOk0hHAp_43bpbn7854MA4XVxXcAqNo3DhtuEoPS78vXbpsx7JRsDQzutqizk--UqPyD12WTB9fzJuxWYLUFKxiVSmOBcu7Rpx_HHMd2VOwaiHQAsK3h1UXPjFUmVo"
+      image: "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
+      icon: "📈"
     }
   ];
 
@@ -58,8 +62,8 @@ export default function Onboarding() {
   return (
     <>
       <Head>
-        <title>Welcome to Stitches - Onboarding</title>
-        <meta name="description" content="Get started with Stitches - your professional invoice management platform" />
+        <title>Welcome to StitchesX - Onboarding</title>
+        <meta name="description" content="Get started with StitchesX - your professional invoice management platform" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -73,7 +77,7 @@ export default function Onboarding() {
               <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
               </svg>
-              <h2 className="tracking-tight">Stitches</h2>
+              <h2 className="tracking-tight">StitchesX</h2>
             </Link>
             <div className="flex items-center gap-4">
               <button className="grid size-10 place-content-center rounded-full transition-colors hover:bg-gray-100">
@@ -86,50 +90,67 @@ export default function Onboarding() {
           </header>
 
           <main className="flex flex-1 items-center justify-center py-10">
-            <div className="w-full max-w-lg rounded-2xl border border-gray-200/80 bg-white/60 p-8 shadow-2xl shadow-gray-600/10 backdrop-blur-lg">
-              <div className="text-center">
-                <h1 className="text-3xl font-bold tracking-tighter">{currentStepData.title}</h1>
-                <p className="mt-2 text-gray-500">{currentStepData.description}</p>
+            <div className="w-full max-w-2xl rounded-2xl border border-gray-200/80 bg-white/60 p-8 shadow-2xl shadow-gray-600/10 backdrop-blur-lg">
+              <div className="text-center mb-8">
+                <div className="text-6xl mb-4 animate-bounce">{currentStepData.icon}</div>
+                <h1 className="text-3xl font-bold tracking-tighter text-gray-900 mb-4">{currentStepData.title}</h1>
+                <p className="text-lg text-gray-600 leading-relaxed">{currentStepData.description}</p>
               </div>
               
-              <div className="relative mt-8 aspect-[4/3] w-full">
-                <div className="absolute inset-0 rounded-2xl bg-cover bg-center bg-no-repeat shadow-inner" style={{backgroundImage: `url("${currentStepData.image}")`}}></div>
+              <div className="relative mt-8 aspect-[16/10] w-full overflow-hidden rounded-2xl shadow-2xl">
+                <div 
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out transform hover:scale-105" 
+                  style={{backgroundImage: `url("${currentStepData.image}")`}}
+                ></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
               </div>
 
               {/* Progress indicators */}
-              <div className="mt-6 flex justify-center gap-2">
+              <div className="mt-8 flex justify-center gap-3">
                 {steps.map((step) => (
                   <div
                     key={step.id}
-                    className={`h-2 w-2 rounded-full transition-colors ${
-                      step.id === currentStep ? 'bg-primary' : 'bg-gray-300'
+                    className={`w-4 h-4 rounded-full transition-all duration-500 cursor-pointer ${
+                      step.id === currentStep
+                        ? 'bg-blue-600 scale-125 shadow-lg shadow-blue-600/50'
+                        : step.id < currentStep
+                        ? 'bg-green-500 hover:bg-green-600'
+                        : 'bg-gray-300 hover:bg-gray-400'
                     }`}
+                    onClick={() => setCurrentStep(step.id)}
                   />
                 ))}
+              </div>
+
+              {/* Step counter */}
+              <div className="mt-4 text-center">
+                <span className="text-sm text-gray-500">
+                  Step {currentStep} of {steps.length}
+                </span>
               </div>
 
               <div className="mt-8 flex justify-between gap-4">
                 {currentStep > 1 ? (
                   <button 
                     onClick={handlePrevious}
-                    className="flex-1 rounded-lg bg-gray-100 py-2.5 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-200/80"
+                    className="flex-1 rounded-lg bg-gray-100 py-3 text-sm font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-200 hover:scale-105"
                   >
-                    Previous
+                    ← Previous
                   </button>
                 ) : (
                   <button 
                     onClick={handleSkip}
-                    className="flex-1 rounded-lg bg-gray-100 py-2.5 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-200/80"
+                    className="flex-1 rounded-lg bg-gray-100 py-3 text-sm font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-200 hover:scale-105"
                   >
-                    Skip
+                    Skip Tour
                   </button>
                 )}
                 
                 <button 
                   onClick={handleNext}
-                  className="flex-1 rounded-lg bg-primary py-2.5 text-sm font-bold text-white transition-colors hover:bg-blue-600"
+                  className="flex-1 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 py-3 text-sm font-semibold text-white transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:scale-105 shadow-lg hover:shadow-xl"
                 >
-                  {currentStep === steps.length ? 'Get Started' : 'Next'}
+                  {currentStep === steps.length ? '🚀 Get Started' : 'Next →'}
                 </button>
               </div>
             </div>

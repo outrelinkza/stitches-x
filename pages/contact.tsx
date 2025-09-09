@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
 import Header from '../components/Header';
 
 export default function Contact() {
@@ -11,225 +10,215 @@ export default function Contact() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      setSubmitted(true);
-      setIsSubmitting(false);
-    }, 1000);
-  };
+    setSubmitStatus('idle');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    try {
+      // Simulate form submission
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <>
       <Head>
         <title>Contact Us - StitchesX</title>
-        <meta name="description" content="Get in touch with StitchesX support team" />
+        <meta name="description" content="Get in touch with StitchesX support team. We're here to help with your invoice generation needs." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
       </Head>
 
-      <div className="min-h-screen bg-gray-50">
-        <Header currentPage="contact" showNewInvoiceButton={false} />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <Header />
         
-        <main className="container mx-auto px-4 py-12">
+        <main className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto">
-            {/* Breadcrumb */}
-            <nav className="mb-8">
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Link href="/" className="hover:text-gray-900 transition-colors">Home</Link>
-                <span className="material-symbols-outlined text-xs">chevron_right</span>
-                <span className="text-gray-900">Contact Us</span>
-              </div>
-            </nav>
-
-            <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight mb-4">
-                Contact Us
+            {/* Header Section */}
+            <div className="text-center mb-16">
+              <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+                Get in Touch
               </h1>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Have questions about StitchesX? We're here to help! Send us a message and we'll get back to you as soon as possible.
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                Have questions about StitchesX? Need help with your invoices? 
+                We're here to help you succeed.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-12">
               {/* Contact Form */}
               <div className="glass-effect rounded-2xl p-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Send us a Message</h2>
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">Send us a Message</h2>
                 
-                {submitted ? (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="material-symbols-outlined text-green-600 text-2xl">check</span>
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
-                    <p className="text-gray-600 mb-6">Thank you for contacting us. We'll get back to you within 24 hours.</p>
-                    <button 
-                      onClick={() => setSubmitted(false)}
-                      className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                      Send Another Message
-                    </button>
+                {submitStatus === 'success' && (
+                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-800">Thank you! Your message has been sent successfully.</p>
                   </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        required
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                        placeholder="Your full name"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                        placeholder="your.email@example.com"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                        Subject
-                      </label>
-                      <input
-                        type="text"
-                        id="subject"
-                        name="subject"
-                        required
-                        value={formData.subject}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                        placeholder="What's this about?"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                        Message
-                      </label>
-                      <textarea
-                        id="message"
-                        name="message"
-                        required
-                        rows={6}
-                        value={formData.message}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                        placeholder="Tell us how we can help you..."
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full bg-primary text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting ? 'Sending...' : 'Send Message'}
-                    </button>
-                  </form>
                 )}
+
+                {submitStatus === 'error' && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800">Sorry, there was an error sending your message. Please try again.</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Your full name"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="subject" className="block text-sm font-medium text-slate-700 mb-2">
+                      Subject
+                    </label>
+                    <input
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="What's this about?"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-2">
+                      Message
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={6}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Tell us how we can help you..."
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                  </button>
+                </form>
               </div>
 
               {/* Contact Information */}
               <div className="space-y-8">
                 <div className="glass-effect rounded-2xl p-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-6">Get in Touch</h2>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6">Contact Information</h2>
                   
                   <div className="space-y-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="material-symbols-outlined text-primary">email</span>
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">Email Support</h3>
-                        <p className="text-gray-600">support@stitchesx.com</p>
-                        <p className="text-sm text-gray-500">We typically respond within 24 hours</p>
+                        <h3 className="font-semibold text-slate-900">Email</h3>
+                        <p className="text-slate-600">support@stitchesx.com</p>
+                        <p className="text-slate-600">hello@stitchesx.com</p>
                       </div>
                     </div>
 
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="material-symbols-outlined text-primary">schedule</span>
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">Business Hours</h3>
-                        <p className="text-gray-600">Monday - Friday</p>
-                        <p className="text-gray-600">9:00 AM - 6:00 PM PST</p>
+                        <h3 className="font-semibold text-slate-900">Response Time</h3>
+                        <p className="text-slate-600">Within 24 hours</p>
+                        <p className="text-slate-600">Monday - Friday</p>
                       </div>
                     </div>
 
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="material-symbols-outlined text-primary">help</span>
+                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
+                        </svg>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">Help Center</h3>
-                        <p className="text-gray-600">Check our FAQ for quick answers</p>
-                        <Link href="/" className="text-primary hover:text-blue-600 transition-colors text-sm">
-                          Visit Help Center →
-                        </Link>
+                        <h3 className="font-semibold text-slate-900">Support</h3>
+                        <p className="text-slate-600">Technical assistance</p>
+                        <p className="text-slate-600">Account help</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
+                {/* FAQ Section */}
                 <div className="glass-effect rounded-2xl p-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Frequently Asked Questions</h2>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6">Frequently Asked Questions</h2>
                   
                   <div className="space-y-4">
                     <div>
-                      <h3 className="font-medium text-gray-900">How do I create an invoice?</h3>
-                      <p className="text-gray-600 text-sm">Simply fill out the form on our homepage with your business and client information, add line items, and generate your professional invoice.</p>
+                      <h3 className="font-semibold text-slate-900 mb-2">How do I get started?</h3>
+                      <p className="text-slate-600 text-sm">Simply create an account and start generating invoices immediately. No credit card required for the free tier.</p>
                     </div>
                     
                     <div>
-                      <h3 className="font-medium text-gray-900">Is StitchesX free to use?</h3>
-                      <p className="text-gray-600 text-sm">Yes! We offer free invoice generation with premium features available for advanced users.</p>
+                      <h3 className="font-semibold text-slate-900 mb-2">What payment methods do you accept?</h3>
+                      <p className="text-slate-600 text-sm">We accept all major credit cards through Stripe. Secure and encrypted payments.</p>
                     </div>
                     
                     <div>
-                      <h3 className="font-medium text-gray-900">Can I customize my invoices?</h3>
-                      <p className="text-gray-600 text-sm">Absolutely! You can add your logo, choose from different templates, and customize colors and fonts.</p>
+                      <h3 className="font-semibold text-slate-900 mb-2">Can I cancel my subscription?</h3>
+                      <p className="text-slate-600 text-sm">Yes, you can cancel anytime from your account settings. No cancellation fees.</p>
                     </div>
                   </div>
                 </div>
@@ -238,14 +227,19 @@ export default function Contact() {
           </div>
         </main>
 
-        <footer className="mt-auto py-8 px-10">
-          <div className="container mx-auto text-center text-sm text-slate-500">
-            <div className="flex justify-center items-center space-x-6">
-              <Link href="/terms" className="hover:text-slate-800 transition-colors">Terms of Service</Link>
-              <Link href="/privacy" className="hover:text-slate-800 transition-colors">Privacy Policy</Link>
-              <Link href="/contact" className="hover:text-slate-800 transition-colors">Contact Us</Link>
+        {/* Footer */}
+        <footer className="bg-slate-900 text-white py-12">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <h3 className="text-2xl font-bold mb-4">StitchesX</h3>
+              <p className="text-slate-300 mb-6">Professional invoice generation made simple</p>
+              <div className="flex justify-center space-x-6">
+                <a href="/terms" className="text-slate-300 hover:text-white">Terms</a>
+                <a href="/privacy" className="text-slate-300 hover:text-white">Privacy</a>
+                <a href="/contact" className="text-slate-300 hover:text-white">Contact</a>
+              </div>
+              <p className="text-slate-400 mt-6">© 2025 StitchesX. All rights reserved.</p>
             </div>
-            <p className="mt-4">© 2025 StitchesX. All rights reserved.</p>
           </div>
         </footer>
       </div>

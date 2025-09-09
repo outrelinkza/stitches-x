@@ -4,6 +4,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Header from '../components/Header';
+import { useAuth } from '../lib/auth';
+import { sendInvoiceEmail } from '../lib/email';
 
 // Initialize Stripe only when needed
 const getStripePromise = () => {
@@ -35,22 +37,99 @@ interface Invoice {
 
 export default function Home() {
   const router = useRouter();
+  const { user: authUser, loading: authLoading } = useAuth();
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
   
-  // User account system
+  // User account system - now using real authentication
   const [user, setUser] = useState({
-    id: 'user_123',
-    email: 'user@example.com',
-    name: 'John Doe',
+    id: authUser?.id || 'anonymous',
+    email: authUser?.email || 'guest@example.com',
+    name: authUser?.user_metadata?.name || 'Guest User',
     freeDownloadsUsed: 0,
-    freeDownloadsLimit: 2,
+    freeDownloadsLimit: authUser ? 2 : 1, // Authenticated users get 2, anonymous get 1
     isPremium: false,
     invoices: [] as Invoice[]
   });
   
+  // Load user data from database
+  const loadUserData = async (userId: string) => {
+    try {
+      const response = await fetch('/api/user-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(prev => ({
+          ...prev,
+          freeDownloadsUsed: userData.freeDownloadsUsed || 0,
+          isPremium: userData.isPremium || false,
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+    }
+  };
+
+  // Check anonymous user limits
+  const checkAnonymousLimits = async () => {
+    if (!authUser) {
+      try {
+        const response = await fetch('/api/anonymous-tracking', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ action: 'check_limit' }),
+        });
+        
+        if (response.ok) {
+          const limitData = await response.json();
+          setUser(prev => ({
+            ...prev,
+            freeDownloadsUsed: limitData.downloadsUsed,
+            freeDownloadsLimit: limitData.limit,
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to check anonymous limits:', error);
+      }
+    }
+  };
+
+  // Update user when authentication changes
+  useEffect(() => {
+    if (authUser) {
+      setUser(prev => ({
+        ...prev,
+        id: authUser.id,
+        email: authUser.email || 'user@example.com',
+        name: authUser.user_metadata?.name || 'User',
+        freeDownloadsLimit: 2,
+      }));
+      // Load user data from database
+      loadUserData(authUser.id);
+    } else {
+      setUser(prev => ({
+        ...prev,
+        id: 'anonymous',
+        email: 'guest@example.com',
+        name: 'Guest User',
+        freeDownloadsLimit: 1,
+        isPremium: false,
+      }));
+      // Check anonymous user limits
+      checkAnonymousLimits();
+    }
+  }, [authUser]);
+
   // Handle template parameter from URL
   useEffect(() => {
     if (router.query.template) {
@@ -206,6 +285,51 @@ export default function Home() {
           // Show info notification instead of alert
           setNotification({ type: 'info', message: 'Invoice generated! Payment required to download.' });
         }
+
+        // Send invoice email to client if email is provided
+        if (clientInfo.email && clientInfo.email.trim()) {
+          try {
+            const invoiceData = {
+              invoice_number: invoiceDetails.number,
+              company_name: companyInfo.name,
+              company_address: companyInfo.address,
+              client_name: clientInfo.name,
+              client_address: clientInfo.address,
+              client_email: clientInfo.email,
+              invoice_date: invoiceDetails.date,
+              due_date: invoiceDetails.dueDate,
+              line_items: lineItems,
+              subtotal: calculateSubtotal(),
+              tax_rate: additionalOptions.taxRate,
+              tax_amount: calculateTax(),
+              total: calculateTotal(),
+              notes: additionalOptions.notes
+            };
+
+            await sendInvoiceEmail({
+              to_email: clientInfo.email,
+              to_name: clientInfo.name,
+              invoice_data: invoiceData,
+              user_id: authUser?.id
+            });
+
+            setNotification({ 
+              type: 'success', 
+              message: 'Invoice generated and sent to client via email!' 
+            });
+          } catch (emailError) {
+            console.error('Failed to send invoice email:', emailError);
+            // Don't show error to user as invoice was generated successfully
+          }
+        }
+        
+        // Warn anonymous users about account benefits
+        if (!authUser) {
+          setNotification({ 
+            type: 'info', 
+            message: 'Guest users get only 1 free download. Create an account for 2 free downloads and premium features!' 
+          });
+        }
         
         setIsFormValid(true);
       } else {
@@ -230,13 +354,48 @@ export default function Home() {
     document.body.removeChild(a);
   };
 
-  const updateUserDownloads = () => {
+  const updateUserDownloads = async () => {
     if (generatedInvoice) {
+      // Update local state
       setUser(prev => ({
         ...prev,
         freeDownloadsUsed: prev.freeDownloadsUsed + 1,
         invoices: [...prev.invoices, generatedInvoice]
       }));
+
+      // Track in database
+      try {
+        if (authUser) {
+          // Track authenticated user
+          await fetch('/api/user-tracking', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: authUser.id,
+              action: 'invoice_download',
+              invoiceId: generatedInvoice.id,
+              amount: generatedInvoice.total
+            }),
+          });
+        } else {
+          // Track anonymous user
+          await fetch('/api/anonymous-tracking', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'track_download',
+              invoiceId: generatedInvoice.id,
+              amount: generatedInvoice.total
+            }),
+          });
+        }
+      } catch (error) {
+        console.error('Failed to track user activity:', error);
+      }
     }
   };
 
@@ -286,6 +445,70 @@ export default function Home() {
         body: JSON.stringify({
           amount: 9.99, // $9.99 per invoice
           invoiceNumber: invoiceDetails.number,
+        }),
+      });
+
+      const { sessionId } = await response.json();
+
+      const { error } = await stripe!.redirectToCheckout({
+        sessionId,
+      });
+
+      if (error) {
+        console.error('Error:', error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handlePerInvoicePayment = async () => {
+    // Check if we have real API keys
+    const hasRealKeys = typeof window !== 'undefined' && 
+                       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && 
+                       !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.includes('your_stripe');
+    
+    if (!hasRealKeys) {
+      // Use mock payment for demo
+      try {
+        const response = await fetch('/api/create-payment-mock', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: 2.00, // £2.00 per invoice
+            invoiceNumber: invoiceDetails.number,
+          }),
+        });
+
+        const { url } = await response.json();
+        window.location.href = url; // Redirect to success page
+        return;
+      } catch (error) {
+        alert('Demo payment failed. Please try again.');
+        return;
+      }
+    }
+
+    const stripePromise = getStripePromise();
+    if (!stripePromise) {
+      alert('Stripe is not configured. Please add your Stripe keys to .env.local');
+      return;
+    }
+
+    const stripe = await stripePromise;
+    
+    try {
+      const response = await fetch('/api/create-per-invoice-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          invoiceNumber: invoiceDetails.number,
+          userId: authUser?.id,
+          customerEmail: authUser?.email || clientInfo.email,
         }),
       });
 
@@ -359,11 +582,19 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-blue-600">person</span>
                   <span className="text-sm font-medium text-blue-900">{user.name}</span>
+                  {!authUser && (
+                    <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded-full">
+                      Guest
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-blue-600">download</span>
                   <span className="text-sm text-blue-700">
                     {user.freeDownloadsUsed}/{user.freeDownloadsLimit} free downloads used
+                    {!authUser && (
+                      <span className="text-orange-600 font-medium"> (Guest limit)</span>
+                    )}
                   </span>
                 </div>
                 {user.isPremium && (
@@ -373,25 +604,50 @@ export default function Home() {
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <Link 
-                  href="/dashboard" 
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200"
-                >
-                  Dashboard
-                </Link>
-                <Link 
-                  href="/invoice-builder" 
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
-                >
-                  Premium Builder
-                </Link>
-                {user.freeDownloadsUsed >= user.freeDownloadsLimit && !user.isPremium && (
-                  <button 
-                    onClick={() => setShowPaymentModal(true)}
-                    className="bg-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    Upgrade to Premium
-                  </button>
+                {!authUser ? (
+                  <>
+                    <Link 
+                      href="/onboarding" 
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200"
+                    >
+                      How It Works
+                    </Link>
+                    <Link 
+                      href="/auth" 
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200"
+                    >
+                      Sign In
+                    </Link>
+                    <Link 
+                      href="/auth" 
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Create Account
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link 
+                      href="/dashboard" 
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link 
+                      href="/invoice-builder" 
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      Premium Builder
+                    </Link>
+                    {user.freeDownloadsUsed >= user.freeDownloadsLimit && !user.isPremium && (
+                      <button 
+                        onClick={() => setShowPaymentModal(true)}
+                        className="bg-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                      >
+                        Upgrade to Premium
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -802,6 +1058,156 @@ export default function Home() {
             </div>
           </main>
 
+          {/* Pricing Section */}
+          <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
+                <p className="text-lg text-gray-600">Choose the plan that works best for your business</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                {/* Free Plan */}
+                <div className="glass-effect rounded-2xl p-8 text-center border-2 border-gray-200 hover:border-blue-300 transition-all duration-300">
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Free</h3>
+                    <div className="text-4xl font-bold text-gray-900 mb-2">$0</div>
+                    <p className="text-gray-600">Perfect for getting started</p>
+                  </div>
+                  <ul className="space-y-3 mb-8 text-left">
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">2 free invoice downloads</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Basic templates</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">PDF generation</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Email support</span>
+                    </li>
+                  </ul>
+                  <Link 
+                    href="/auth"
+                    className="w-full bg-gray-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-700 transition-colors inline-block"
+                  >
+                    Get Started Free
+                  </Link>
+                </div>
+
+                {/* Premium Plan */}
+                <div className="glass-effect rounded-2xl p-8 text-center border-2 border-blue-500 relative transform scale-105 shadow-xl">
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Most Popular</span>
+                  </div>
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Premium</h3>
+                    <div className="text-4xl font-bold text-gray-900 mb-2">$9.99</div>
+                    <p className="text-gray-600">One-time payment</p>
+                  </div>
+                  <ul className="space-y-3 mb-8 text-left">
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Unlimited downloads</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Premium templates</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Custom branding</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Priority support</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Invoice history</span>
+                    </li>
+                  </ul>
+                  <button 
+                    onClick={() => setShowPaymentModal(true)}
+                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  >
+                    Upgrade to Premium
+                  </button>
+                </div>
+
+                {/* Enterprise Plan */}
+                <div className="glass-effect rounded-2xl p-8 text-center border-2 border-gray-200 hover:border-purple-300 transition-all duration-300">
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Enterprise</h3>
+                    <div className="text-4xl font-bold text-gray-900 mb-2">Custom</div>
+                    <p className="text-gray-600">For large teams</p>
+                  </div>
+                  <ul className="space-y-3 mb-8 text-left">
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Everything in Premium</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Team collaboration</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">API access</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Dedicated support</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Custom integrations</span>
+                    </li>
+                  </ul>
+                  <Link 
+                    href="/contact"
+                    className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors inline-block"
+                  >
+                    Contact Sales
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <footer className="mt-auto py-8 px-10">
             <div className="container mx-auto text-center text-sm text-slate-500">
               <div className="flex justify-center items-center space-x-6">
@@ -866,7 +1272,7 @@ export default function Home() {
                   <h4 className="text-lg font-medium text-gray-900 mb-2">Free Downloads Exceeded</h4>
                   <p className="text-gray-600">
                     You've used {user.freeDownloadsUsed}/{user.freeDownloadsLimit} free downloads. 
-                    Pay $9.99 to download this invoice and get unlimited access.
+                    Choose a payment option below to download this invoice.
                   </p>
                 </div>
                 
@@ -878,41 +1284,36 @@ export default function Home() {
                 </div>
                 
                 <div className="space-y-3">
-                  <button 
-                    onClick={async () => {
-                      // Process payment
-                      const hasRealKeys = typeof window !== 'undefined' && 
-                                         process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && 
-                                         !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.includes('your_stripe');
-                      
-                      if (!hasRealKeys) {
-                        // Mock payment - redirect to success page
-                        window.location.href = `/success?invoice=${generatedInvoice.id}&payment=mock`;
-                      } else {
-                        // Real Stripe payment
-                        const stripePromise = getStripePromise();
-                        if (stripePromise) {
-                          const stripe = await stripePromise;
-                          if (!stripe) return;
-                          const { error } = await stripe.redirectToCheckout({
-                            lineItems: [{
-                              price: 'price_1234567890', // Your Stripe price ID
-                              quantity: 1,
-                            }],
-                            mode: 'payment',
-                            successUrl: `${window.location.origin}/success?invoice=${generatedInvoice.id}`,
-                            cancelUrl: `${window.location.origin}/cancel`,
-                          });
-                          if (error) {
-                            setNotification({ type: 'error', message: 'Payment failed. Please try again.' });
-                          }
-                        }
-                      }
-                    }}
-                    className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-600 transition-colors"
-                  >
-                    Pay $9.99 & Download
-                  </button>
+                  {/* Per-Invoice Option */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold text-green-800">Pay Per Invoice</span>
+                      <span className="text-lg font-bold text-green-600">£2.00</span>
+                    </div>
+                    <p className="text-sm text-green-700 mb-3">Pay only for this invoice</p>
+                    <button 
+                      onClick={handlePerInvoicePayment}
+                      className="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
+                    >
+                      Pay £2.00 & Download
+                    </button>
+                  </div>
+
+                  {/* Premium Option */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold text-blue-800">Premium Access</span>
+                      <span className="text-lg font-bold text-blue-600">£9.99</span>
+                    </div>
+                    <p className="text-sm text-blue-700 mb-3">Unlimited invoices + premium features</p>
+                    <button 
+                      onClick={handlePayment}
+                      className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Upgrade to Premium
+                    </button>
+                  </div>
+
                   <button 
                     onClick={() => setShowPaymentModal(false)}
                     className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors"

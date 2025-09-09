@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import Header from '../components/Header';
+import DeleteAccount from '../components/DeleteAccount';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('general');
@@ -283,6 +284,51 @@ export default function Settings() {
                                 className="w-full rounded-lg border border-gray-300 bg-white/80 px-4 py-3 text-gray-900 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                               />
                             </div>
+                          </div>
+                          
+                          {/* Data Export Section */}
+                          <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                            <h3 className="text-lg font-semibold text-blue-900 mb-2">Data Export & Privacy</h3>
+                            <p className="text-sm text-blue-700 mb-4">
+                              Download all your data including invoices, client information, and account details.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                              <button
+                                onClick={() => {
+                                  // Trigger data export
+                                  window.location.href = '/api/gdpr-export?type=all';
+                                }}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                              >
+                                Export All Data
+                              </button>
+                              <button
+                                onClick={() => {
+                                  // Trigger invoice export
+                                  window.location.href = '/api/gdpr-export?type=invoices';
+                                }}
+                                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+                              >
+                                Export Invoices Only
+                              </button>
+                              <button
+                                onClick={() => {
+                                  // Trigger client export
+                                  window.location.href = '/api/gdpr-export?type=clients';
+                                }}
+                                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+                              >
+                                Export Clients Only
+                              </button>
+                            </div>
+                            <p className="text-xs text-blue-600 mt-3">
+                              Data will be exported as a ZIP file containing JSON and CSV formats.
+                            </p>
+                          </div>
+                          
+                          {/* Delete Account Section */}
+                          <div className="mt-8">
+                            <DeleteAccount />
                           </div>
                         </div>
                       )}
