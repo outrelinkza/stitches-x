@@ -105,3 +105,37 @@ export async function sendWelcomeEmail(email: string, name: string) {
     throw error;
   }
 }
+
+export async function sendInvoiceEmail(email: string, invoiceData: any) {
+  try {
+    if (!resend) {
+      console.log('Resend not configured, skipping invoice email');
+      return null;
+    }
+    
+    const { data, error } = await resend.emails.send({
+      from: 'Stitches <noreply@stitches.com>',
+      to: [email],
+      subject: `Invoice ${invoiceData.invoiceNumber || 'INV-001'} from Stitches`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Invoice ${invoiceData.invoiceNumber || 'INV-001'}</h2>
+          <p>Please find your invoice attached. Thank you for your business!</p>
+          <p>Amount: $${invoiceData.total || '0.00'}</p>
+          <p>Due Date: ${invoiceData.dueDate || 'N/A'}</p>
+          <p>Best regards,<br>The Stitches Team</p>
+        </div>
+      `,
+    });
+
+    if (error) {
+      console.error('Error sending invoice email:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send invoice email:', error);
+    throw error;
+  }
+}
