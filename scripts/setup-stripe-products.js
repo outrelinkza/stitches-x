@@ -15,11 +15,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 async function createStripeProducts() {
-  console.log('🚀 Setting up Stripe products for StitchesX...\n');
+  console.log('Setting up Stripe products for StitchesX...\n');
 
   try {
     // 1. Create Premium Invoice Generation Product
-    console.log('📄 Creating Premium Invoice Generation product...');
+    console.log('Creating Premium Invoice Generation product...');
     const premiumProduct = await stripe.products.create({
       name: 'Premium Invoice Generation',
       description: 'Generate unlimited professional invoices with premium templates and features',
@@ -39,8 +39,8 @@ async function createStripeProducts() {
       }
     });
 
-    console.log(`✅ Premium Product: ${premiumProduct.id}`);
-    console.log(`✅ Premium Price: ${premiumPrice.id}\n`);
+    console.log(`Premium Product: ${premiumProduct.id}`);
+    console.log(`Premium Price: ${premiumPrice.id}\n`);
 
     // 2. Create Monthly Subscription Product
     console.log('📅 Creating Monthly Subscription product...');
@@ -66,8 +66,8 @@ async function createStripeProducts() {
       }
     });
 
-    console.log(`✅ Monthly Product: ${monthlyProduct.id}`);
-    console.log(`✅ Monthly Price: ${monthlyPrice.id}\n`);
+    console.log(`Monthly Product: ${monthlyProduct.id}`);
+    console.log(`Monthly Price: ${monthlyPrice.id}\n`);
 
     // 3. Create Annual Subscription Product
     console.log('📅 Creating Annual Subscription product...');
@@ -93,8 +93,8 @@ async function createStripeProducts() {
       }
     });
 
-    console.log(`✅ Annual Product: ${annualProduct.id}`);
-    console.log(`✅ Annual Price: ${annualPrice.id}\n`);
+    console.log(`Annual Product: ${annualProduct.id}`);
+    console.log(`Annual Price: ${annualPrice.id}\n`);
 
     // 4. Create Enterprise Product
     console.log('🏢 Creating Enterprise product...');
@@ -121,8 +121,8 @@ async function createStripeProducts() {
       }
     });
 
-    console.log(`✅ Enterprise Product: ${enterpriseProduct.id}`);
-    console.log(`✅ Enterprise Price: ${enterprisePrice.id}\n`);
+    console.log(`Enterprise Product: ${enterpriseProduct.id}`);
+    console.log(`Enterprise Price: ${enterprisePrice.id}\n`);
 
     // 5. Output environment variables
     console.log('🔧 Add these to your .env.local file:\n');
@@ -133,13 +133,13 @@ async function createStripeProducts() {
     console.log(`STRIPE_ENTERPRISE_PRICE_ID=${enterprisePrice.id}\n`);
 
     console.log('🎉 Stripe products setup complete!');
-    console.log('\n📋 Next steps:');
+    console.log('\nNext steps:');
     console.log('1. Add the environment variables above to your .env.local file');
     console.log('2. Set up webhook endpoints in your Stripe dashboard');
     console.log('3. Test the payment flow');
 
   } catch (error) {
-    console.error('❌ Error setting up Stripe products:', error.message);
+    console.error('Error setting up Stripe products:', error.message);
     process.exit(1);
   }
 }

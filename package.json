@@ -7,19 +7,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "server": "./start-background-server.sh",
+    "server:stop": "./stop-server.sh",
+    "server:status": "./check-server.sh"
   },
   "dependencies": {
     "@stripe/stripe-js": "^2.0.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.57.2",
+    "@types/nodemailer": "^7.0.1",
     "date-fns": "^2.30.0",
     "jspdf": "^2.5.1",
     "next": "^14.0.0",
+    "nodemailer": "^7.0.6",
     "openai": "^4.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "resend": "^6.0.3",
     "stripe": "^14.0.0"
   },
   "devDependencies": {

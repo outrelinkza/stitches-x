@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { sendWelcomeEmail } from '../lib/email';
+import Avatar from '../components/Avatar';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -93,16 +94,8 @@ export default function Auth() {
   return (
     <>
       <Head>
-        <title>StitchesX - {isLogin ? 'Sign In' : 'Sign Up'}</title>
+        <title>StitchesX - Authentication</title>
         <meta name="description" content="Sign in or create an account with StitchesX" />
-        <link rel="preconnect" href="https://fonts.gstatic.com/" crossOrigin="" />
-        <link
-          as="style"
-          href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;600;700;900&family=Noto+Sans:wght@400;500;600;700;900"
-          onLoad={() => {}}
-          rel="stylesheet"
-        />
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -154,6 +147,16 @@ export default function Auth() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your full name"
                   />
+                </div>
+              )}
+
+              {!isLogin && formData.fullName && (
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Avatar name={formData.fullName} size="md" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Your Avatar</p>
+                    <p className="text-xs text-gray-500">This will be generated from your name</p>
+                  </div>
                 </div>
               )}
 

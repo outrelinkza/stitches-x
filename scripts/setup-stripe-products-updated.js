@@ -15,11 +15,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 async function createStripeProducts() {
-  console.log('🚀 Setting up Stripe products for StitchesX with per-invoice pricing...\n');
+  console.log('Setting up Stripe products for StitchesX with per-invoice pricing...\n');
 
   try {
     // 1. Create Per-Invoice Product (£2 per invoice)
-    console.log('📄 Creating Per-Invoice product (£2 per invoice)...');
+    console.log('Creating Per-Invoice product (£2 per invoice)...');
     const perInvoiceProduct = await stripe.products.create({
       name: 'Single Invoice Generation',
       description: 'Generate one professional invoice - £2 per invoice',
@@ -40,11 +40,11 @@ async function createStripeProducts() {
       }
     });
 
-    console.log(`✅ Per-Invoice Product: ${perInvoiceProduct.id}`);
-    console.log(`✅ Per-Invoice Price: ${perInvoicePrice.id}\n`);
+    console.log(`Per-Invoice Product: ${perInvoiceProduct.id}`);
+    console.log(`Per-Invoice Price: ${perInvoicePrice.id}\n`);
 
     // 2. Create Premium Invoice Generation Product (£9.99 unlimited)
-    console.log('📄 Creating Premium Invoice Generation product...');
+    console.log('Creating Premium Invoice Generation product...');
     const premiumProduct = await stripe.products.create({
       name: 'Premium Invoice Generation',
       description: 'Generate unlimited professional invoices with premium templates and features',
@@ -64,11 +64,11 @@ async function createStripeProducts() {
       }
     });
 
-    console.log(`✅ Premium Product: ${premiumProduct.id}`);
-    console.log(`✅ Premium Price: ${premiumPrice.id}\n`);
+    console.log(`Premium Product: ${premiumProduct.id}`);
+    console.log(`Premium Price: ${premiumPrice.id}\n`);
 
     // 3. Create Monthly Subscription Product (£4.99/month)
-    console.log('📅 Creating Monthly Subscription product...');
+    console.log('Creating Monthly Subscription product...');
     const monthlyProduct = await stripe.products.create({
       name: 'StitchesX Monthly Pro',
       description: 'Monthly subscription for unlimited invoices and premium features',
@@ -91,11 +91,11 @@ async function createStripeProducts() {
       }
     });
 
-    console.log(`✅ Monthly Product: ${monthlyProduct.id}`);
-    console.log(`✅ Monthly Price: ${monthlyPrice.id}\n`);
+    console.log(`Monthly Product: ${monthlyProduct.id}`);
+    console.log(`Monthly Price: ${monthlyPrice.id}\n`);
 
     // 4. Create Annual Subscription Product (£49.99/year)
-    console.log('📅 Creating Annual Subscription product...');
+    console.log('Creating Annual Subscription product...');
     const annualProduct = await stripe.products.create({
       name: 'StitchesX Annual Pro',
       description: 'Annual subscription for unlimited invoices and premium features (Save 17%)',
@@ -118,11 +118,11 @@ async function createStripeProducts() {
       }
     });
 
-    console.log(`✅ Annual Product: ${annualProduct.id}`);
-    console.log(`✅ Annual Price: ${annualPrice.id}\n`);
+    console.log(`Annual Product: ${annualProduct.id}`);
+    console.log(`Annual Price: ${annualPrice.id}\n`);
 
     // 5. Create Enterprise Product (£19.99/month)
-    console.log('🏢 Creating Enterprise product...');
+    console.log('Creating Enterprise product...');
     const enterpriseProduct = await stripe.products.create({
       name: 'StitchesX Enterprise',
       description: 'Enterprise solution with team collaboration and API access',
@@ -146,11 +146,11 @@ async function createStripeProducts() {
       }
     });
 
-    console.log(`✅ Enterprise Product: ${enterpriseProduct.id}`);
-    console.log(`✅ Enterprise Price: ${enterprisePrice.id}\n`);
+    console.log(`Enterprise Product: ${enterpriseProduct.id}`);
+    console.log(`Enterprise Price: ${enterprisePrice.id}\n`);
 
     // 6. Output environment variables
-    console.log('🔧 Add these to your .env.local file:\n');
+    console.log('Add these to your .env.local file:\n');
     console.log('# Stripe Product IDs (GBP Pricing)');
     console.log(`STRIPE_PER_INVOICE_PRICE_ID=${perInvoicePrice.id}`);
     console.log(`STRIPE_PREMIUM_INVOICE_PRICE_ID=${premiumPrice.id}`);
@@ -158,21 +158,21 @@ async function createStripeProducts() {
     console.log(`STRIPE_ANNUAL_SUBSCRIPTION_PRICE_ID=${annualPrice.id}`);
     console.log(`STRIPE_ENTERPRISE_PRICE_ID=${enterprisePrice.id}\n`);
 
-    console.log('🎉 Stripe products setup complete with per-invoice pricing!');
-    console.log('\n📋 Pricing Structure:');
+    console.log('Stripe products setup complete with per-invoice pricing!');
+    console.log('\nPricing Structure:');
     console.log('• Free: 1-2 invoices (guest/registered users)');
     console.log('• Per Invoice: £2.00 per additional invoice');
     console.log('• Premium: £9.99 for unlimited invoices');
     console.log('• Monthly: £4.99/month for unlimited');
     console.log('• Annual: £49.99/year for unlimited (Save 17%)');
     console.log('• Enterprise: £19.99/month for teams');
-    console.log('\n📋 Next steps:');
+    console.log('\nNext steps:');
     console.log('1. Add the environment variables above to your .env.local file');
     console.log('2. Set up webhook endpoints in your Stripe dashboard');
     console.log('3. Test the payment flow');
 
   } catch (error) {
-    console.error('❌ Error setting up Stripe products:', error.message);
+    console.error('Error setting up Stripe products:', error.message);
     process.exit(1);
   }
 }

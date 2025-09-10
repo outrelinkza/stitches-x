@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import Header from '../components/Header';
 import { useAuth } from '../lib/auth';
 import { sendInvoiceEmail } from '../lib/email';
+import Avatar from '../components/Avatar';
 
 // Initialize Stripe only when needed
 const getStripePromise = () => {
@@ -40,7 +41,7 @@ export default function Home() {
   const { user: authUser, loading: authLoading } = useAuth();
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
   
   // User account system - now using real authentication
@@ -116,15 +117,33 @@ export default function Home() {
     }
   }, [authUser]);
 
-  // Initialize dynamic values on client side only to prevent hydration mismatch
-  useEffect(() => {
-    setIsClient(true);
-    setInvoiceDetails(prev => ({
-      ...prev,
-      number: `INV-${Date.now()}`,
-      date: new Date().toISOString().split('T')[0],
-    }));
-  }, []);
+  // Function to calculate due date based on payment terms
+  const calculateDueDate = (invoiceDate: string, paymentTerms: string) => {
+    if (!invoiceDate) return '';
+    
+    const date = new Date(invoiceDate);
+    
+    switch (paymentTerms) {
+      case 'due_on_receipt':
+        return invoiceDate;
+      case 'net_15':
+        date.setDate(date.getDate() + 15);
+        break;
+      case 'net_30':
+        date.setDate(date.getDate() + 30);
+        break;
+      case 'net_45':
+        date.setDate(date.getDate() + 45);
+        break;
+      case 'net_60':
+        date.setDate(date.getDate() + 60);
+        break;
+      default:
+        return invoiceDate;
+    }
+    
+    return date.toISOString().split('T')[0];
+  };
 
   // Handle template parameter from URL
   useEffect(() => {
@@ -143,33 +162,57 @@ export default function Home() {
   const [notification, setNotification] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null);
   
   const [companyInfo, setCompanyInfo] = useState({
-    name: '',
+    name: 'Your Company Name',
     address: '',
     email: '',
     phone: '',
   });
   
   const [clientInfo, setClientInfo] = useState({
-    name: '',
+    name: 'Client Name',
     address: '',
     email: '',
     phone: '',
   });
   
   const [invoiceDetails, setInvoiceDetails] = useState({
-    number: '',
-    date: '',
+    number: 'INV-001',
+    date: '2025-01-09',
     dueDate: '',
     currency: 'GBP',
+    paymentTerms: 'net_30',
+    lateFeeRate: 0,
+    lateFeeAmount: 0
   });
+
+  // Auto-calculate due date when invoice date or payment terms change
+  useEffect(() => {
+    if (invoiceDetails.date && invoiceDetails.paymentTerms !== 'custom') {
+      const dueDate = calculateDueDate(invoiceDetails.date, invoiceDetails.paymentTerms);
+      setInvoiceDetails(prev => ({ ...prev, dueDate }));
+    }
+  }, [invoiceDetails.date, invoiceDetails.paymentTerms]);
   
   const [isClient, setIsClient] = useState(false);
   
   const [lineItems, setLineItems] = useState<LineItem[]>([
-    { description: '', quantity: 1, rate: 0, total: 0 }
+    { description: 'Sample Item', quantity: 1, rate: 100, total: 100 }
   ]);
   
   const [taxRate, setTaxRate] = useState(10);
+  
+  // Toggle states for features
+  const [emailRemindersEnabled, setEmailRemindersEnabled] = useState(false);
+  const [onlinePaymentEnabled, setOnlinePaymentEnabled] = useState(false);
+  const [clientAccessEnabled, setClientAccessEnabled] = useState(false);
+  
+  // Payment method states
+  const [selectedPaymentMethods, setSelectedPaymentMethods] = useState({
+    visa: false,
+    mastercard: false,
+    amex: false,
+    paypal: false
+  });
   
   const [additionalOptions, setAdditionalOptions] = useState({
     taxRate: 10,
@@ -177,9 +220,729 @@ export default function Home() {
     notes: 'Thank you for your business.',
     terms: '',
     recurring: false,
+    recurringFrequency: 'monthly',
+    recurringDuration: '12',
+  });
+
+  // Type-specific fields
+  const [typeSpecificFields, setTypeSpecificFields] = useState({
+    // Medical/Dental/Veterinary
+    patientId: '',
+    insuranceProvider: '',
+    policyNumber: '',
+    procedureCode: '',
+    
+    // Legal
+    caseNumber: '',
+    courtFees: 0,
+    billableHours: 0,
+    
+    // Freelance/Consulting
+    hourlyRate: 0,
+    projectPhase: '',
+    milestone: '',
+    
+    // Product/Sales
+    sku: '',
+    inventory: '',
+    shippingMethod: '',
+    
+    // Service Provider
+    serviceType: '',
+    serviceLocation: '',
+    serviceDate: '',
+    
+    // Subscription
+    subscriptionPlan: '',
+    billingCycle: 'monthly',
+    
+    // Maintenance/Repair
+    equipmentId: '',
+    issueDescription: '',
+    warrantyInfo: '',
+    
+    // Training/Education
+    courseName: '',
+    instructorName: '',
+    certificationNumber: '',
+    
+    // Real Estate
+    propertyAddress: '',
+    listingId: '',
+    commissionRate: 0,
+    
+    // Transportation
+    vehicleId: '',
+    route: '',
+    distance: 0,
+    
+    // Hospitality
+    roomNumber: '',
+    checkInDate: '',
+    checkOutDate: '',
+    
+    // Insurance
+    policyType: '',
+    coverageAmount: 0,
+    claimNumber: '',
+    
+    // Utilities
+    meterReading: '',
+    usageAmount: 0,
+    servicePeriod: '',
+    
+    // Rental
+    rentalPeriod: '',
+    depositAmount: 0,
+    lateFees: 0,
   });
 
   const logoInputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize dynamic values on client side only to prevent hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+    setInvoiceDetails(prev => ({
+      ...prev,
+      number: `INV-${Date.now()}`,
+      date: new Date().toISOString().split('T')[0],
+    }));
+  }, []);
+
+  // Set default company and client names to make form valid by default
+  useEffect(() => {
+    if (isClient) {
+      setCompanyInfo(prev => ({
+        ...prev,
+        name: prev.name || 'Your Company Name'
+      }));
+      setClientInfo(prev => ({
+        ...prev,
+        name: prev.name || 'Client Name'
+      }));
+    }
+  }, [isClient]);
+
+  // Force form validation after setting defaults
+  useEffect(() => {
+    const isValid = 
+      companyInfo.name.trim() !== '' &&
+      clientInfo.name.trim() !== '' &&
+      invoiceDetails.number.trim() !== '' &&
+      invoiceDetails.date !== '' &&
+      lineItems.some(item => item.description.trim() && item.rate > 0);
+    
+    setIsFormValid(isValid);
+  }, [companyInfo.name, clientInfo.name, invoiceDetails.number, invoiceDetails.date, lineItems]);
+
+  // Function to render type-specific fields
+  const renderTypeSpecificFields = () => {
+    const commonInputClass = "w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400";
+    
+    switch (invoiceType) {
+      case 'medical':
+      case 'dental':
+      case 'veterinary':
+        return (
+          <div className="space-y-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+            <h4 className="text-sm font-semibold text-blue-800 mb-3">Medical Information</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-1">Patient ID</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="PAT-001"
+                  value={typeSpecificFields.patientId}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, patientId: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-1">Insurance Provider</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="Blue Cross"
+                  value={typeSpecificFields.insuranceProvider}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, insuranceProvider: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-1">Policy Number</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="POL-123456"
+                  value={typeSpecificFields.policyNumber}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, policyNumber: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-1">Procedure Code</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="CPT-99213"
+                  value={typeSpecificFields.procedureCode}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, procedureCode: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'legal':
+        return (
+          <div className="space-y-4 p-4 bg-purple-50 rounded-xl border border-purple-200">
+            <h4 className="text-sm font-semibold text-purple-800 mb-3">Legal Information</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-purple-700 mb-1">Case Number</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="CASE-2024-001"
+                  value={typeSpecificFields.caseNumber}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, caseNumber: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-purple-700 mb-1">Billable Hours</label>
+                <input
+                  type="number"
+                  className={commonInputClass}
+                  placeholder="8.5"
+                  value={typeSpecificFields.billableHours}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, billableHours: Number(e.target.value)})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-purple-700 mb-1">Court Fees</label>
+                <input
+                  type="number"
+                  className={commonInputClass}
+                  placeholder="150.00"
+                  value={typeSpecificFields.courtFees}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, courtFees: Number(e.target.value)})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'freelance_consulting':
+        return (
+          <div className="space-y-4 p-4 bg-green-50 rounded-xl border border-green-200">
+            <h4 className="text-sm font-semibold text-green-800 mb-3">Project Information</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-green-700 mb-1">Hourly Rate</label>
+                <input
+                  type="number"
+                  className={commonInputClass}
+                  placeholder="75.00"
+                  value={typeSpecificFields.hourlyRate}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, hourlyRate: Number(e.target.value)})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-green-700 mb-1">Project Phase</label>
+                <select
+                  className={commonInputClass}
+                  value={typeSpecificFields.projectPhase}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, projectPhase: e.target.value})}
+                >
+                  <option value="">Select Phase</option>
+                  <option value="planning">Planning</option>
+                  <option value="development">Development</option>
+                  <option value="testing">Testing</option>
+                  <option value="deployment">Deployment</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-green-700 mb-1">Milestone</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="Phase 1 Complete"
+                  value={typeSpecificFields.milestone}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, milestone: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'product_sales':
+        return (
+          <div className="space-y-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
+            <h4 className="text-sm font-semibold text-orange-800 mb-3">Product Information</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-orange-700 mb-1">SKU</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="SKU-12345"
+                  value={typeSpecificFields.sku}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, sku: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-orange-700 mb-1">Inventory Location</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="Warehouse A"
+                  value={typeSpecificFields.inventory}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, inventory: e.target.value})}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-orange-700 mb-1">Shipping Method</label>
+                <select
+                  className={commonInputClass}
+                  value={typeSpecificFields.shippingMethod}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, shippingMethod: e.target.value})}
+                >
+                  <option value="">Select Shipping</option>
+                  <option value="standard">Standard</option>
+                  <option value="express">Express</option>
+                  <option value="overnight">Overnight</option>
+                  <option value="pickup">Store Pickup</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'subscription':
+        return (
+          <div className="space-y-4 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+            <h4 className="text-sm font-semibold text-indigo-800 mb-3">Subscription Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-indigo-700 mb-1">Plan Name</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="Premium Plan"
+                  value={typeSpecificFields.subscriptionPlan}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, subscriptionPlan: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-indigo-700 mb-1">Billing Cycle</label>
+                <select
+                  className={commonInputClass}
+                  value={typeSpecificFields.billingCycle}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, billingCycle: e.target.value})}
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                  <option value="annually">Annually</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'service_provider':
+      case 'contractor':
+      case 'agency':
+        return (
+          <div className="space-y-4 p-4 bg-teal-50 rounded-xl border border-teal-200">
+            <h4 className="text-sm font-semibold text-teal-800 mb-3">Service Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-teal-700 mb-1">Service Type</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="Consultation"
+                  value={typeSpecificFields.serviceType}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, serviceType: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-teal-700 mb-1">Service Location</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="Client Office"
+                  value={typeSpecificFields.serviceLocation}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, serviceLocation: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-teal-700 mb-1">Service Date</label>
+                <input
+                  type="date"
+                  className={commonInputClass}
+                  value={typeSpecificFields.serviceDate}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, serviceDate: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'maintenance':
+      case 'repair':
+        return (
+          <div className="space-y-4 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+            <h4 className="text-sm font-semibold text-yellow-800 mb-3">Equipment Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-yellow-700 mb-1">Equipment ID</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="EQ-001"
+                  value={typeSpecificFields.equipmentId}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, equipmentId: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-yellow-700 mb-1">Issue Description</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="System maintenance"
+                  value={typeSpecificFields.issueDescription}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, issueDescription: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-yellow-700 mb-1">Warranty Info</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="Under warranty"
+                  value={typeSpecificFields.warrantyInfo}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, warrantyInfo: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'training':
+      case 'education':
+        return (
+          <div className="space-y-4 p-4 bg-pink-50 rounded-xl border border-pink-200">
+            <h4 className="text-sm font-semibold text-pink-800 mb-3">Training Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-pink-700 mb-1">Course Name</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="Advanced Training"
+                  value={typeSpecificFields.courseName}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, courseName: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-pink-700 mb-1">Instructor Name</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="John Smith"
+                  value={typeSpecificFields.instructorName}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, instructorName: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-pink-700 mb-1">Certification Number</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="CERT-12345"
+                  value={typeSpecificFields.certificationNumber}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, certificationNumber: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'real_estate':
+        return (
+          <div className="space-y-4 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+            <h4 className="text-sm font-semibold text-emerald-800 mb-3">Property Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-emerald-700 mb-1">Property Address</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="123 Main St"
+                  value={typeSpecificFields.propertyAddress}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, propertyAddress: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-emerald-700 mb-1">Listing ID</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="LIST-001"
+                  value={typeSpecificFields.listingId}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, listingId: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-emerald-700 mb-1">Commission Rate (%)</label>
+                <input
+                  type="number"
+                  className={commonInputClass}
+                  placeholder="3.5"
+                  value={typeSpecificFields.commissionRate}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, commissionRate: Number(e.target.value)})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'transportation':
+        return (
+          <div className="space-y-4 p-4 bg-cyan-50 rounded-xl border border-cyan-200">
+            <h4 className="text-sm font-semibold text-cyan-800 mb-3">Transportation Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-cyan-700 mb-1">Vehicle ID</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="VEH-001"
+                  value={typeSpecificFields.vehicleId}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, vehicleId: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-cyan-700 mb-1">Route</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="City A to City B"
+                  value={typeSpecificFields.route}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, route: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-cyan-700 mb-1">Distance (miles)</label>
+                <input
+                  type="number"
+                  className={commonInputClass}
+                  placeholder="150"
+                  value={typeSpecificFields.distance}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, distance: Number(e.target.value)})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'hospitality':
+        return (
+          <div className="space-y-4 p-4 bg-rose-50 rounded-xl border border-rose-200">
+            <h4 className="text-sm font-semibold text-rose-800 mb-3">Accommodation Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-rose-700 mb-1">Room Number</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="101"
+                  value={typeSpecificFields.roomNumber}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, roomNumber: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-rose-700 mb-1">Check-in Date</label>
+                <input
+                  type="date"
+                  className={commonInputClass}
+                  value={typeSpecificFields.checkInDate}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, checkInDate: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-rose-700 mb-1">Check-out Date</label>
+                <input
+                  type="date"
+                  className={commonInputClass}
+                  value={typeSpecificFields.checkOutDate}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, checkOutDate: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'insurance':
+        return (
+          <div className="space-y-4 p-4 bg-violet-50 rounded-xl border border-violet-200">
+            <h4 className="text-sm font-semibold text-violet-800 mb-3">Insurance Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-violet-700 mb-1">Policy Type</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="Auto Insurance"
+                  value={typeSpecificFields.policyType}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, policyType: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-violet-700 mb-1">Coverage Amount</label>
+                <input
+                  type="number"
+                  className={commonInputClass}
+                  placeholder="50000"
+                  value={typeSpecificFields.coverageAmount}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, coverageAmount: Number(e.target.value)})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-violet-700 mb-1">Claim Number</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="CLM-001"
+                  value={typeSpecificFields.claimNumber}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, claimNumber: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'utilities':
+        return (
+          <div className="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <h4 className="text-sm font-semibold text-slate-800 mb-3">Utility Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Meter Reading</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="12345"
+                  value={typeSpecificFields.meterReading}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, meterReading: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Usage Amount</label>
+                <input
+                  type="number"
+                  className={commonInputClass}
+                  placeholder="150"
+                  value={typeSpecificFields.usageAmount}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, usageAmount: Number(e.target.value)})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Service Period</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="January 2024"
+                  value={typeSpecificFields.servicePeriod}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, servicePeriod: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'rental':
+        return (
+          <div className="space-y-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+            <h4 className="text-sm font-semibold text-amber-800 mb-3">Rental Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-amber-700 mb-1">Rental Period</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="1 month"
+                  value={typeSpecificFields.rentalPeriod}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, rentalPeriod: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-amber-700 mb-1">Deposit Amount</label>
+                <input
+                  type="number"
+                  className={commonInputClass}
+                  placeholder="500"
+                  value={typeSpecificFields.depositAmount}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, depositAmount: Number(e.target.value)})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-amber-700 mb-1">Late Fees</label>
+                <input
+                  type="number"
+                  className={commonInputClass}
+                  placeholder="25"
+                  value={typeSpecificFields.lateFees}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, lateFees: Number(e.target.value)})}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'estimate':
+        return (
+          <div className="space-y-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200">
+            <h4 className="text-sm font-semibold text-purple-800 mb-3">Estimate Details</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-purple-700 mb-1">Valid Until</label>
+                <input
+                  type="date"
+                  className={commonInputClass}
+                  value={typeSpecificFields.serviceDate}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, serviceDate: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-purple-700 mb-1">Project Duration</label>
+                <input
+                  type="text"
+                  className={commonInputClass}
+                  placeholder="2-3 weeks"
+                  value={typeSpecificFields.milestone}
+                  onChange={(e) => setTypeSpecificFields({...typeSpecificFields, milestone: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <p className="text-xs text-purple-700">
+                <strong>Note:</strong> This is an estimate. Final pricing may vary based on actual work performed. 
+                Client approval required before work begins.
+              </p>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // Check form validity whenever form data changes
+  useEffect(() => {
+    // Form validation is handled by the other useEffect
+  }, []);
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -221,7 +984,7 @@ export default function Home() {
   };
 
   const calculateTax = () => {
-    return (calculateSubtotal() * additionalOptions.taxRate) / 100;
+    return (calculateSubtotal() * taxRate) / 100;
   };
 
   const calculateTotal = () => {
@@ -229,6 +992,37 @@ export default function Home() {
   };
 
   const generateInvoice = async () => {
+    // Validate required fields
+    if (!companyInfo.name.trim()) {
+      setNotification({ type: 'error', message: 'Please enter your company name' });
+      return;
+    }
+    
+    if (!clientInfo.name.trim()) {
+      setNotification({ type: 'error', message: 'Please enter client name' });
+      return;
+    }
+    
+    if (!invoiceDetails.number.trim()) {
+      setNotification({ type: 'error', message: 'Please enter invoice number' });
+      return;
+    }
+    
+    if (!invoiceDetails.date) {
+      setNotification({ type: 'error', message: 'Please select invoice date' });
+      return;
+    }
+    
+    // Check if at least one line item has a description and rate > 0
+    const hasValidLineItem = lineItems.some(item => 
+      item.description.trim() && item.rate > 0
+    );
+    
+    if (!hasValidLineItem) {
+      setNotification({ type: 'error', message: 'Please add at least one line item with description and price' });
+      return;
+    }
+    
     setIsGenerating(true);
     
     try {
@@ -300,7 +1094,7 @@ export default function Home() {
               due_date: invoiceDetails.dueDate,
               line_items: lineItems,
               subtotal: calculateSubtotal(),
-              tax_rate: additionalOptions.taxRate,
+              tax_rate: taxRate,
               tax_amount: calculateTax(),
               total: calculateTotal(),
               notes: additionalOptions.notes
@@ -526,7 +1320,10 @@ export default function Home() {
       number: `INV-${Date.now()}`, 
       date: new Date().toISOString().split('T')[0], 
       dueDate: '', 
-      currency: 'USD' 
+      currency: 'GBP',
+      paymentTerms: 'net_30',
+      lateFeeRate: 0,
+      lateFeeAmount: 0
     });
     setLineItems([{ description: '', quantity: 1, rate: 0, total: 0 }]);
     setAdditionalOptions({ 
@@ -534,7 +1331,53 @@ export default function Home() {
       discount: 0, 
       notes: 'Thank you for your business.', 
       terms: '', 
-      recurring: false 
+      recurring: false,
+      recurringFrequency: 'monthly',
+      recurringDuration: '12'
+    });
+    setTypeSpecificFields({
+      patientId: '',
+      insuranceProvider: '',
+      policyNumber: '',
+      procedureCode: '',
+      caseNumber: '',
+      courtFees: 0,
+      billableHours: 0,
+      hourlyRate: 0,
+      projectPhase: '',
+      milestone: '',
+      sku: '',
+      inventory: '',
+      shippingMethod: '',
+      serviceType: '',
+      serviceLocation: '',
+      serviceDate: '',
+      subscriptionPlan: '',
+      billingCycle: 'monthly',
+      equipmentId: '',
+      issueDescription: '',
+      warrantyInfo: '',
+      courseName: '',
+      instructorName: '',
+      certificationNumber: '',
+      propertyAddress: '',
+      listingId: '',
+      commissionRate: 0,
+      vehicleId: '',
+      route: '',
+      distance: 0,
+      roomNumber: '',
+      checkInDate: '',
+      checkOutDate: '',
+      policyType: '',
+      coverageAmount: 0,
+      claimNumber: '',
+      meterReading: '',
+      usageAmount: 0,
+      servicePeriod: '',
+      rentalPeriod: '',
+      depositAmount: 0,
+      lateFees: 0,
     });
     setLogo(null);
     setIsFormValid(false);
@@ -552,16 +1395,6 @@ export default function Home() {
         <meta name="description" content="Generate professional invoices instantly with premium templates. Support for freelancers, businesses, and all invoice types." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="preconnect" href="https://fonts.gstatic.com/" crossOrigin="" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;500;600;700&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" />
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
       </Head>
       
       <div className="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden bg-gray-100">
@@ -572,14 +1405,16 @@ export default function Home() {
           <div className="bg-blue-50 border-b border-blue-200 px-10 py-3">
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-blue-600">person</span>
-                  <span className="text-sm font-medium text-blue-900">{user.name}</span>
-                  {!authUser && (
-                    <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded-full">
-                      Guest
-                    </span>
-                  )}
+                <div className="flex items-center gap-3">
+                  <Avatar name={user.name} size="sm" />
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-blue-900">{user.name}</span>
+                    {!authUser && (
+                      <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded-full">
+                        Guest
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-blue-600">download</span>
@@ -773,19 +1608,19 @@ export default function Home() {
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-slate-700">Invoice Number</label>
                       <input 
-                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400" 
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400"                                                                                                             
                         placeholder="INV-001" 
                         type="text"
-                        value={isClient ? invoiceDetails.number : ''}
+                        value={invoiceDetails.number}
                         onChange={(e) => setInvoiceDetails({...invoiceDetails, number: e.target.value})}
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-slate-700">Invoice Date</label>
                       <input 
-                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800" 
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800"                      
                         type="date"
-                        value={isClient ? invoiceDetails.date : ''}
+                        value={invoiceDetails.date}
                         onChange={(e) => setInvoiceDetails({...invoiceDetails, date: e.target.value})}
                       />
                     </div>
@@ -820,9 +1655,52 @@ export default function Home() {
                         value={invoiceType}
                         onChange={(e) => setInvoiceType(e.target.value)}
                       >
-                        <option value="product_sales">🛍️ Product/Sales</option>
-                        <option value="freelance_consulting">💼 Freelance/Consulting</option>
-                        <option value="simple_receipt">🧾 Simple Receipt</option>
+                        <option value="product_sales">Product/Sales</option>
+                        <option value="freelance_consulting">Freelance/Consulting</option>
+                        <option value="service_provider">Service Provider</option>
+                        <option value="contractor">Contractor</option>
+                        <option value="agency">Agency</option>
+                        <option value="retail">Retail</option>
+                        <option value="wholesale">Wholesale</option>
+                        <option value="subscription">Subscription</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="repair">Repair</option>
+                        <option value="installation">Installation</option>
+                        <option value="training">Training</option>
+                        <option value="consultation">Consultation</option>
+                        <option value="design">Design</option>
+                        <option value="development">Development</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="legal">Legal</option>
+                        <option value="accounting">Accounting</option>
+                        <option value="medical">Medical</option>
+                        <option value="dental">Dental</option>
+                        <option value="veterinary">Veterinary</option>
+                        <option value="education">Education</option>
+                        <option value="transportation">Transportation</option>
+                        <option value="hospitality">Hospitality</option>
+                        <option value="real_estate">Real Estate</option>
+                        <option value="insurance">Insurance</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="rental">Rental</option>
+                        <option value="simple_receipt">Simple Receipt</option>
+                        <option value="estimate">Estimate/Quote</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-slate-700">Payment Terms</label>
+                      <select 
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800" 
+                        value={invoiceDetails.paymentTerms}
+                        onChange={(e) => setInvoiceDetails({...invoiceDetails, paymentTerms: e.target.value})}
+                      >
+                        <option value="due_on_receipt">Due on Receipt</option>
+                        <option value="net_15">Net 15</option>
+                        <option value="net_30">Net 30</option>
+                        <option value="net_45">Net 45</option>
+                        <option value="net_60">Net 60</option>
+                        <option value="custom">Custom</option>
                       </select>
                     </div>
                     <div className="space-y-2">
@@ -841,14 +1719,38 @@ export default function Home() {
                   </div>
                 </section>
 
-                {invoiceType === 'product_sales' && (
-                  <section className="space-y-6">
-                    <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                      </svg>
-                      Line Items
-                    </h3>
+                {/* Type-Specific Fields */}
+                {renderTypeSpecificFields()}
+
+                {/* Line Items - Only show for invoice types that need them */}
+                {(invoiceType === 'product_sales' || 
+                  invoiceType === 'retail' || 
+                  invoiceType === 'wholesale' || 
+                  invoiceType === 'maintenance' || 
+                  invoiceType === 'repair' || 
+                  invoiceType === 'installation' || 
+                  invoiceType === 'training' || 
+                  invoiceType === 'consultation' || 
+                  invoiceType === 'design' || 
+                  invoiceType === 'development' || 
+                  invoiceType === 'marketing' || 
+                  invoiceType === 'accounting' || 
+                  invoiceType === 'education' || 
+                  invoiceType === 'transportation' || 
+                  invoiceType === 'hospitality' || 
+                  invoiceType === 'real_estate' || 
+                  invoiceType === 'insurance' || 
+                  invoiceType === 'utilities' || 
+                  invoiceType === 'rental' || 
+                  invoiceType === 'estimate' || 
+                  invoiceType === 'other') && (
+                <section className="space-y-6">
+                  <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    {invoiceType === 'estimate' ? 'Estimate Items' : 'Line Items'}
+                  </h3>
                     <div className="space-y-4">
                       <div className="grid grid-cols-12 gap-4 p-4 bg-slate-50 rounded-xl">
                         <div className="col-span-5"><span className="text-sm font-semibold text-slate-700">Item Description</span></div>
@@ -894,15 +1796,15 @@ export default function Home() {
                           </button>
                         </div>
                       ))}
-                      <button 
-                        onClick={addLineItem}
-                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        Add Line Item
-                      </button>
+                    <button 
+                      onClick={addLineItem}
+                      className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      {invoiceType === 'estimate' ? 'Add Estimate Item' : 'Add Line Item'}
+                    </button>
                     </div>
                   </section>
                 )}
@@ -1009,24 +1911,22 @@ export default function Home() {
                         <div className="w-full md:w-1/2 lg:w-1/3 space-y-3">
                           <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-slate-700">Subtotal</span>
-                            <span className="text-sm text-slate-800 font-medium">${calculateSubtotal().toFixed(2)}</span>
+                            <span className="text-sm text-slate-800 font-medium">
+                              {invoiceDetails.currency === 'GBP' ? '£' : invoiceDetails.currency === 'USD' ? '$' : invoiceDetails.currency === 'EUR' ? '€' : invoiceDetails.currency === 'JPY' ? '¥' : '$'}{calculateSubtotal().toFixed(2)}
+                            </span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium text-slate-700">Tax (%)</span>
-                            <div className="relative w-24">
-                              <input 
-                                className="w-full rounded-md border-gray-300 bg-white/50 shadow-sm focus:ring-0 input-focus-glow text-right pr-2" 
-                                placeholder="10" 
-                                type="number"
-                                value={additionalOptions.taxRate}
-                                onChange={(e) => setAdditionalOptions({...additionalOptions, taxRate: Number(e.target.value)})}
-                              />
-                            </div>
+                            <span className="text-sm font-medium text-slate-700">Tax ({taxRate}%)</span>
+                            <span className="text-sm text-slate-800 font-medium">
+                              {invoiceDetails.currency === 'GBP' ? '£' : invoiceDetails.currency === 'USD' ? '$' : invoiceDetails.currency === 'EUR' ? '€' : invoiceDetails.currency === 'JPY' ? '¥' : '$'}{((calculateSubtotal() * taxRate) / 100).toFixed(2)}
+                            </span>
                           </div>
                           <div className="border-t border-gray-300/80 my-2"></div>
                           <div className="flex justify-between items-center">
                             <span className="text-lg font-bold text-slate-900">Total</span>
-                            <span className="text-lg font-bold text-slate-900">${calculateTotal().toFixed(2)}</span>
+                            <span className="text-lg font-bold text-slate-900">
+                              {invoiceDetails.currency === 'GBP' ? '£' : invoiceDetails.currency === 'USD' ? '$' : invoiceDetails.currency === 'EUR' ? '€' : invoiceDetails.currency === 'JPY' ? '¥' : '$'}{calculateTotal().toFixed(2)}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -1036,6 +1936,170 @@ export default function Home() {
 
                 <section className="space-y-4 pt-4 border-t border-white/50">
                   <h3 className="text-lg font-semibold text-slate-800">Payment Options</h3>
+                  
+                  {/* Payment Terms Display */}
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h4 className="text-sm font-semibold text-blue-800 mb-2">Payment Terms</h4>
+                    <p className="text-sm text-blue-700">
+                      {invoiceDetails.paymentTerms === 'due_on_receipt' && 'Payment is due immediately upon receipt of this invoice.'}
+                      {invoiceDetails.paymentTerms === 'net_15' && 'Payment is due within 15 days of the invoice date.'}
+                      {invoiceDetails.paymentTerms === 'net_30' && 'Payment is due within 30 days of the invoice date.'}
+                      {invoiceDetails.paymentTerms === 'net_45' && 'Payment is due within 45 days of the invoice date.'}
+                      {invoiceDetails.paymentTerms === 'net_60' && 'Payment is due within 60 days of the invoice date.'}
+                      {invoiceDetails.paymentTerms === 'custom' && 'Custom payment terms apply.'}
+                    </p>
+                    {invoiceDetails.dueDate && (
+                      <p className="text-sm font-medium text-blue-800 mt-1">
+                        Due Date: {new Date(invoiceDetails.dueDate).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Late Payment Fees */}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold text-slate-700">Late Payment Fees</h4>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-600 mb-1">Late Fee Rate (%)</label>
+                        <input
+                          type="number"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          placeholder="1.5"
+                          min="0"
+                          step="0.1"
+                          value={invoiceDetails.lateFeeRate}
+                          onChange={(e) => setInvoiceDetails({...invoiceDetails, lateFeeRate: Number(e.target.value)})}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-600 mb-1">Fixed Late Fee Amount</label>
+                        <input
+                          type="number"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          placeholder="25.00"
+                          min="0"
+                          step="0.01"
+                          value={invoiceDetails.lateFeeAmount}
+                          onChange={(e) => setInvoiceDetails({...invoiceDetails, lateFeeAmount: Number(e.target.value)})}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Late fees will be applied to overdue invoices. Choose either a percentage rate or fixed amount.
+                    </p>
+                  </div>
+
+                  {/* Email Reminders (Optional) */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-slate-700">Email Reminders</h4>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <span className="text-sm text-slate-600">Off</span>
+                        <div className="relative" onClick={() => setEmailRemindersEnabled(!emailRemindersEnabled)}>
+                          <input className="sr-only" type="checkbox" checked={emailRemindersEnabled} readOnly />
+                          <div className="block bg-gray-200 w-10 h-6 rounded-full"></div>
+                          <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${emailRemindersEnabled ? 'translate-x-full !bg-primary' : ''}`}></div>
+                        </div>
+                        <span className="text-sm text-slate-600">On</span>
+                      </label>
+                    </div>
+                    <div className="space-y-2 pl-4 border-l-2 border-slate-200">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-slate-700">Send reminder 3 days before due date</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-slate-700">Send reminder 1 day after due date</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-slate-700">Send reminder 7 days after due date</span>
+                      </label>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Optional email notifications sent to client email addresses. No payment processing involved.
+                    </p>
+                  </div>
+
+                  {/* Online Payment Methods (Optional) */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-slate-700">Online Payment Methods</h4>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <span className="text-sm text-slate-600">Off</span>
+                        <div className="relative" onClick={() => setOnlinePaymentEnabled(!onlinePaymentEnabled)}>
+                          <input className="sr-only" type="checkbox" checked={onlinePaymentEnabled} readOnly />
+                          <div className="block bg-gray-200 w-10 h-6 rounded-full"></div>
+                          <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${onlinePaymentEnabled ? 'translate-x-full !bg-primary' : ''}`}></div>
+                        </div>
+                        <span className="text-sm text-slate-600">On</span>
+                      </label>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      <label className="flex items-center space-x-2 cursor-pointer p-3 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          checked={selectedPaymentMethods.visa}
+                          onChange={(e) => setSelectedPaymentMethods({...selectedPaymentMethods, visa: e.target.checked})}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-4 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold">V</div>
+                          <span className="text-sm text-slate-700">Visa</span>
+                        </div>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer p-3 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          checked={selectedPaymentMethods.mastercard}
+                          onChange={(e) => setSelectedPaymentMethods({...selectedPaymentMethods, mastercard: e.target.checked})}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-4 bg-red-600 rounded text-white text-xs flex items-center justify-center font-bold">M</div>
+                          <span className="text-sm text-slate-700">Mastercard</span>
+                        </div>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer p-3 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          checked={selectedPaymentMethods.amex}
+                          onChange={(e) => setSelectedPaymentMethods({...selectedPaymentMethods, amex: e.target.checked})}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-4 bg-blue-500 rounded text-white text-xs flex items-center justify-center font-bold">A</div>
+                          <span className="text-sm text-slate-700">Amex</span>
+                        </div>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer p-3 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          checked={selectedPaymentMethods.paypal}
+                          onChange={(e) => setSelectedPaymentMethods({...selectedPaymentMethods, paypal: e.target.checked})}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-4 bg-orange-500 rounded text-white text-xs flex items-center justify-center font-bold">P</div>
+                          <span className="text-sm text-slate-700">PayPal</span>
+                        </div>
+                      </label>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Selected payment methods will be displayed on the invoice for client reference only.
+                    </p>
+                  </div>
+
                   <div className="flex items-center space-x-4">
                     <span className="text-sm font-medium text-slate-700">Recurring Invoice:</span>
                     <label className="flex items-center space-x-2 cursor-pointer">
@@ -1052,21 +2116,220 @@ export default function Home() {
                       </div>
                       <span className="text-sm text-slate-600">On</span>
                     </label>
-                    <span className="text-xs text-slate-500 italic">(Coming Soon)</span>
+                  </div>
+                  
+                  {additionalOptions.recurring && (
+                    <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <h4 className="text-sm font-semibold text-blue-800 mb-3">Recurring Settings</h4>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="block text-sm font-medium text-blue-700 mb-1">Frequency</label>
+                          <select 
+                            className="w-full px-3 py-2 rounded-lg border border-blue-300 bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            value={additionalOptions.recurringFrequency}
+                            onChange={(e) => setAdditionalOptions({...additionalOptions, recurringFrequency: e.target.value})}
+                          >
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="annually">Annually</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-blue-700 mb-1">Duration</label>
+                          <select 
+                            className="w-full px-3 py-2 rounded-lg border border-blue-300 bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            value={additionalOptions.recurringDuration}
+                            onChange={(e) => setAdditionalOptions({...additionalOptions, recurringDuration: e.target.value})}
+                          >
+                            <option value="3">3 times</option>
+                            <option value="6">6 times</option>
+                            <option value="12">12 times</option>
+                            <option value="indefinite">Indefinite</option>
+                          </select>
+                        </div>
+                      </div>
+                      <p className="text-xs text-blue-600 mt-2">Recurring invoices will be automatically generated and sent to your client.</p>
+                    </div>
+                  )}
+                </section>
+
+                {/* Time Tracking Section */}
+                <section className="space-y-4 pt-4 border-t border-white/50">
+                  <h3 className="text-lg font-semibold text-slate-800">Time Tracking</h3>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-sm font-semibold text-slate-700">Track Time for This Project</h4>
+                      <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Start Timer
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-600 mb-1">Project Name</label>
+                        <input
+                          type="text"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          placeholder="Website Development"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-600 mb-1">Hourly Rate</label>
+                        <input
+                          type="number"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          placeholder="75.00"
+                          step="0.01"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-600 mb-1">Total Hours</label>
+                        <input
+                          type="number"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          placeholder="0.00"
+                          step="0.25"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between text-sm text-slate-600">
+                      <span>Time entries will be automatically added to line items</span>
+                      <span className="font-medium">Total: £0.00</span>
+                    </div>
                   </div>
                 </section>
 
-                <section>
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-700">Additional Notes</span>
+                {/* Expense Tracking Section */}
+                <section className="space-y-4 pt-4 border-t border-white/50">
+                  <h3 className="text-lg font-semibold text-slate-800">Expense Tracking</h3>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-sm font-semibold text-slate-700">Track Expenses for This Project</h4>
+                      <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Add Expense
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-600 mb-1">Expense Type</label>
+                          <select className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <option value="">Select Type</option>
+                            <option value="travel">Travel</option>
+                            <option value="meals">Meals</option>
+                            <option value="supplies">Supplies</option>
+                            <option value="software">Software</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-600 mb-1">Description</label>
+                          <input
+                            type="text"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            placeholder="Client lunch meeting"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-600 mb-1">Amount</label>
+                          <input
+                            type="number"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            placeholder="25.50"
+                            step="0.01"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-600 mb-1">Receipt</label>
+                          <input
+                            type="file"
+                            accept="image/*,.pdf"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-sm text-slate-600">
+                        <span>Expenses will be added to line items for reimbursement</span>
+                        <span className="font-medium">Total Expenses: £0.00</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="space-y-4 pt-4 border-t border-white/50">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-slate-700">Additional Notes</label>
                     <textarea 
-                      className="mt-1 block w-full rounded-md border-gray-300 bg-white/50 shadow-sm focus:ring-0 input-focus-glow" 
+                      className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-slate-800 placeholder-slate-400 resize-none" 
                       placeholder="Thank you for your business." 
                       rows={3}
                       value={additionalOptions.notes}
                       onChange={(e) => setAdditionalOptions({...additionalOptions, notes: e.target.value})}
                     ></textarea>
-                  </label>
+                  </div>
+                </section>
+
+                {/* Business Analytics & Reporting */}
+                {/* Client Portal */}
+                <section className="space-y-4 pt-4 border-t border-white/50">
+                  <h3 className="text-lg font-semibold text-slate-800">Client Access</h3>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-sm font-semibold text-slate-700">Enable Client Access</h4>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <span className="text-sm text-slate-600">Off</span>
+                        <div className="relative" onClick={() => setClientAccessEnabled(!clientAccessEnabled)}>
+                          <input className="sr-only" type="checkbox" checked={clientAccessEnabled} readOnly />
+                          <div className="block bg-gray-200 w-10 h-6 rounded-full"></div>
+                          <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${clientAccessEnabled ? 'translate-x-full !bg-primary' : ''}`}></div>
+                        </div>
+                        <span className="text-sm text-slate-600">On</span>
+                      </label>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-600 mb-1">Access URL</label>
+                        <input type="text" className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="yourcompany.stitchesx.com" />
+                      </div>
+                      <p className="text-xs text-slate-500">Clients can view and download their invoices. Simple and secure.</p>
+                    </div>
+                  </div>
+                </section>
+
+
+                {/* Document Analytics (Non-Financial) */}
+                <section className="space-y-4 pt-4 border-t border-white/50">
+                  <h3 className="text-lg font-semibold text-slate-800">Document Analytics</h3>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      <div className="text-center p-3 bg-white rounded-lg border border-slate-200">
+                        <div className="text-2xl font-bold text-blue-600">0</div>
+                        <div className="text-sm text-slate-600">Invoices Created</div>
+                      </div>
+                      <div className="text-center p-3 bg-white rounded-lg border border-slate-200">
+                        <div className="text-2xl font-bold text-green-600">0</div>
+                        <div className="text-sm text-slate-600">PDF Downloads</div>
+                      </div>
+                      <div className="text-center p-3 bg-white rounded-lg border border-slate-200">
+                        <div className="text-2xl font-bold text-orange-600">0</div>
+                        <div className="text-sm text-slate-600">Templates Used</div>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex justify-center">
+                      <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        View Document History
+                      </button>
+                    </div>
+                  </div>
                 </section>
 
                 <div className="flex flex-col items-center gap-4 pt-6 sm:flex-row sm:justify-center">
@@ -1075,16 +2338,32 @@ export default function Home() {
                     disabled={isGenerating}
                     className="w-full rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg sm:w-auto btn-hover-effect hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isGenerating ? 'Generating...' : 'Generate Invoice'}
+                    {isGenerating ? 'Generating...' : (invoiceType === 'estimate' ? 'Generate Estimate' : 'Generate Invoice')}
                   </button>
-                  <button 
-                    className={`w-full rounded-lg px-6 py-3 text-sm font-bold shadow-lg sm:w-auto btn-hover-effect ${isFormValid ? 'btn-glass-enabled text-slate-800' : 'btn-disabled'}`}
-                    disabled={!isFormValid}
-                    onClick={handlePayment}
-                    title="Click to pay and download invoice"
-                  >
-                    Pay & Download Invoice
-                  </button>
+                  {invoiceType !== 'estimate' && (
+                    <>
+                      <button 
+                        className={`w-full rounded-lg px-6 py-3 text-sm font-bold shadow-lg sm:w-auto btn-hover-effect ${isFormValid ? 'btn-glass-enabled text-slate-800' : 'btn-disabled'}`}
+                        disabled={!isFormValid}
+                        onClick={handlePayment}
+                        title="Click to pay and download invoice"
+                      >
+                        Pay & Download Invoice
+                      </button>
+                      <button 
+                        className="w-full rounded-lg bg-green-600 hover:bg-green-700 px-6 py-3 text-sm font-bold text-white shadow-lg sm:w-auto btn-hover-effect transition-colors"
+                        disabled={!isFormValid}
+                        onClick={() => {
+                          // This would generate an invoice with "Pay Now" button
+                          generateInvoice();
+                          setNotification({ type: 'success', message: 'Invoice generated with online payment options!' });
+                        }}
+                        title="Generate invoice with online payment button"
+                      >
+                        Generate with Pay Now Button
+                      </button>
+                    </>
+                  )}
                   <button 
                     onClick={() => setShowResetModal(true)}
                     className="w-full rounded-lg bg-transparent px-6 py-3 text-sm font-bold text-slate-600 sm:w-auto btn-hover-effect hover:bg-slate-100"
@@ -1104,7 +2383,7 @@ export default function Home() {
                 <p className="text-lg text-gray-600">Choose the plan that works best for your business</p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
                 {/* Free Plan */}
                 <div className="glass-effect rounded-2xl p-8 text-center border-2 border-gray-200 hover:border-blue-300 transition-all duration-300">
                   <div className="mb-6">
@@ -1144,6 +2423,50 @@ export default function Home() {
                   >
                     Get Started Free
                   </Link>
+                </div>
+
+                {/* Per-Invoice Plan */}
+                <div className="glass-effect rounded-2xl p-8 text-center border-2 border-green-500 relative">
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Pay Per Use</span>
+                  </div>
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Per-Invoice</h3>
+                    <div className="text-4xl font-bold text-gray-900 mb-2">£2.99</div>
+                    <p className="text-gray-600">Pay only when you use</p>
+                  </div>
+                  <ul className="space-y-3 mb-8 text-left">
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">£2.99 per invoice download</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Premium templates</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">All invoice types</span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                      <span className="text-gray-700">Email support</span>
+                    </li>
+                  </ul>
+                  <button 
+                    onClick={() => setShowPaymentModal(true)}
+                    className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                  >
+                    Pay Per Invoice
+                  </button>
                 </div>
 
                 {/* Premium Plan */}

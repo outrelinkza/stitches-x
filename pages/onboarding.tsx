@@ -20,21 +20,21 @@ export default function Onboarding() {
       title: "Create Professional Invoices",
       description: "Design beautiful, professional invoices with our easy-to-use template system. Customize colors, fonts, and layouts to match your brand.",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
-      icon: "🎨"
+      icon: "design"
     },
     {
       id: 3,
       title: "Smart Invoice Generation",
       description: "Create invoices in seconds with our intelligent form system. Just fill in the details and watch your professional invoice come to life.",
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80",
-      icon: "⚡"
+      icon: "lightning"
     },
     {
       id: 4,
       title: "Track & Manage Everything",
       description: "Keep track of all your invoices, clients, and payments in one place. Get insights with our analytics dashboard and never miss a payment.",
       image: "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
-      icon: "📈"
+      icon: "chart"
     }
   ];
 
@@ -150,7 +150,7 @@ export default function Onboarding() {
                   onClick={handleNext}
                   className="flex-1 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 py-3 text-sm font-semibold text-white transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:scale-105 shadow-lg hover:shadow-xl"
                 >
-                  {currentStep === steps.length ? '🚀 Get Started' : 'Next →'}
+                  {currentStep === steps.length ? 'Get Started' : 'Next →'}
                 </button>
               </div>
             </div>
