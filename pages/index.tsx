@@ -1100,12 +1100,7 @@ export default function Home() {
               notes: additionalOptions.notes
             };
 
-            await sendInvoiceEmail({
-              to_email: clientInfo.email,
-              to_name: clientInfo.name,
-              invoice_data: invoiceData,
-              user_id: authUser?.id
-            });
+            await sendInvoiceEmail(clientInfo.email, invoiceData);
 
             setNotification({ 
               type: 'success', 
