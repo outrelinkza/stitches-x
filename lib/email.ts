@@ -72,3 +72,36 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string) {
     throw error;
   }
 }
+
+export async function sendWelcomeEmail(email: string, name: string) {
+  try {
+    if (!resend) {
+      console.log('Resend not configured, skipping welcome email');
+      return null;
+    }
+    
+    const { data, error } = await resend.emails.send({
+      from: 'Stitches <noreply@stitches.com>',
+      to: [email],
+      subject: 'Welcome to Stitches!',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Welcome to Stitches, ${name}!</h2>
+          <p>Thank you for joining Stitches AI Invoice Generator. You're all set to create professional invoices with the power of AI.</p>
+          <p>Get started by creating your first invoice or exploring our features.</p>
+          <p>Best regards,<br>The Stitches Team</p>
+        </div>
+      `,
+    });
+
+    if (error) {
+      console.error('Error sending welcome email:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send welcome email:', error);
+    throw error;
+  }
+}
